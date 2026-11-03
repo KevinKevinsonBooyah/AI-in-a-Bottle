@@ -68,3 +68,20 @@ Sources: [Ollama Windows](https://docs.ollama.com/windows), [Ollama FAQ](https:/
 - **Mobile early support:** on narrow touch-screen devices, these buttons open the complete AI panel inside the same tab instead of launching a separate browser tab. The on-page panel expands to the viewport for usability; the three named physical popup sizes are desktop behavior.
 - **Mobile screenshot workaround:** use the browser's Upload button to choose a screenshot from Photos/Files. The live Screen and Box Capture features rely on `getDisplayMedia()`, which is not consistently supported in mobile browsers and always requires user permission when available.
 - iOS Safari/Chrome cannot make a website float above other apps or capture unrelated apps without explicit OS-supported user flow. A PWA/Add to Home Screen layout could be a future mobile improvement.
+
+
+## Free Browser AI (no API key)
+
+The site now has a **Free Browser AI** engine using [WebLLM 0.2.87](https://webllm.mlc.ai/docs/user/get_started.html). It runs locally in compatible Chromium browsers using WebGPU; no Ollama installation, server backend or Gemini credits are required. The inference engine and model weights download from external CDNs on first use. Chrome caches downloaded model data if its storage policy permits. Clearing site data can remove the cache.
+
+### How to use on a Chromebook
+
+1. Open **RUN**, **Small Mode** or **Tiny Mode** and go to **Settings → How to answer → Free Browser AI**.
+2. Click **Check Compatibility**. The check verifies the HTTPS context, usable WebGPU device, and reports a *browser storage quota estimate*, not actual physical free disk space.
+3. Pick **Lightweight (SmolLM2 360M, ~0.6 GB GPU memory)**, **Balanced (Llama 3.2 1B, ~1.1 GB)**, or **Stronger (Llama 3.2 3B, ~3 GB)**. Listed numbers are approximate GPU-memory requirements rather than guaranteed network download sizes.
+4. Press **Download & Start Free AI** to download and load the model, with an on-screen progress indicator. No download begins merely from checking compatibility.
+5. Open **Ask** and ask a **text question**. No API key, daily credit meter or cloud inference request is used for this engine. Gemini and Ollama options remain available.
+
+**Limits:** This browser mode is text-only at present; it cannot interpret Screen/Box Capture images. WebGPU and sufficient GPU memory are mandatory; a fast CPU alone is not enough. School-managed Chromebooks might block GPU access, model CDNs, or browser storage. Passing compatibility checks does not guarantee that a larger model will fit or load successfully. This feature has been syntactically validated and its UI and compatibility path tested with a mocked WebGPU device, but the first real model download and inference have not been verified on a school Chromebook.
+
+Free local inference means no per-message credits; it does not guarantee internet-free startup, unlimited device resources or permission to use school bandwidth/storage.
