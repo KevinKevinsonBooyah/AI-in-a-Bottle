@@ -57,3 +57,14 @@ For GitHub Pages, Ollama might block browser-origin requests. If needed, set `OL
 - **Ollama setup:** **Settings → Ollama** includes numbered instructions and official links for installation, model download (`ollama pull qwen3-vl:4b-instruct`), service testing, and allowing the website origin. **Repair Ollama** diagnoses first; the optional Windows script download is a separate, explicit click. Only run that script on your own computer with permission to install software.
 
 Sources: [Ollama Windows](https://docs.ollama.com/windows), [Ollama FAQ](https://docs.ollama.com/faq), [Qwen model](https://ollama.com/library/qwen3-vl:4b-instruct), [MDN display capture](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getDisplayMedia), [Chrome Local Network Access](https://developer.chrome.com/docs/modern-web-guidance/guides/security/local-network-access).
+
+
+## Launch sizes and mobile behavior
+
+- **RUN:** opens the usual 438 × 690 desktop mini-window.
+- **Small Mode:** requests a 350 × 540 desktop mini-window.
+- **Tiny Mode:** requests a 290 × 420 desktop mini-window, with condensed controls. Browsers may enforce their own minimum window dimensions.
+- Clicking a different launch button while the mini-window is already open attempts to resize it. Right-click to close and then right-click the main page to reopen the most recently selected size.
+- **Mobile early support:** on narrow touch-screen devices, these buttons open the complete AI panel inside the same tab instead of launching a separate browser tab. The on-page panel expands to the viewport for usability; the three named physical popup sizes are desktop behavior.
+- **Mobile screenshot workaround:** use the browser's Upload button to choose a screenshot from Photos/Files. The live Screen and Box Capture features rely on `getDisplayMedia()`, which is not consistently supported in mobile browsers and always requires user permission when available.
+- iOS Safari/Chrome cannot make a website float above other apps or capture unrelated apps without explicit OS-supported user flow. A PWA/Add to Home Screen layout could be a future mobile improvement.
