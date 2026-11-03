@@ -52,7 +52,7 @@ For GitHub Pages, Ollama might block browser-origin requests. If needed, set `OL
 ## Ghost Mode and capture update (November 2026)
 
 - **Stealth mini-window:** dark ocean-night theme, animated radar scan and a small “Ghost Mode” indicator. The tab favicon/title switch to Classroom when Stealth Mode is active; this is only a visual tab disguise, not Google Classroom itself.
-- **Close/reopen:** right-click *inside* the mini-window to close it completely. Right-click inside the original AI in a Bottle web page, or focus that page and press **Alt + Shift + B**, to reopen it with your current draft. Web pages cannot detect right-clicks on Chrome's tab strip, browser chrome, other tabs or other apps.
+- **Close/reopen:** right-click *inside* the mini-window to close it completely. Press Alt inside the original AI in a Bottle web page, or focus that page and press **Alt**, to reopen it with your current draft. Web pages cannot detect right-clicks on Chrome's tab strip, browser chrome, other tabs or other apps.
 - **Box Capture:** on the first use per open mini-window, select a screen or tab in Chrome's permission chooser. The app keeps the approved capture stream for follow-up screenshots, so later Box Capture/Screen presses don't open the chooser again. **Stop Sharing** stops the stream; closing the mini-window stops it too. Chrome's first-time picker is mandatory and cannot be bypassed by HTML. Reusing a stream does not provide permission for other screens.
 - **Ollama setup:** **Settings → Ollama** includes numbered instructions and official links for installation, model download (`ollama pull qwen3-vl:4b-instruct`), service testing, and allowing the website origin. **Repair Ollama** diagnoses first; the optional Windows script download is a separate, explicit click. Only run that script on your own computer with permission to install software.
 
@@ -95,3 +95,27 @@ Free local inference means no per-message credits; it does not guarantee interne
 - **Optional runtimes:** Python uses [Pyodide 0.27.7](https://pyodide.org/en/0.27.7/usage/downloading-and-deploying.html), SQL uses [sql.js/SQLite](https://sql.js.org/), and TypeScript uses the [TypeScript compiler](https://www.typescriptlang.org/). These tools download their browser runtimes from public CDNs on first use and may be blocked by school policy. No operating-system installation is required. Only run code you understand or trust.
 - **Offline mode removed:** the selectable Offline AI engine is gone. The available AI engines are Free Browser AI, Gemini, and local Ollama; built-in math and practice tools remain available.
 - **Screen/Box Capture:** Chrome's [Screen Capture API](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getDisplayMedia) **requires choosing a screen when a new share starts**; no website can bypass it. After the first approval, the app reuses the *same live sharing session* for instant repeat captures. Press **Stop Sharing** or close the popup to end that session. Next time you'll be asked again.
+
+
+## November 3 update: SuperTiny, Browser Vision, quick models, CodeHS-style JavaScript
+
+### Window and keyboard controls
+
+- Launch **SuperTiny Mode** from the home page, requesting a **240 × 310** popup. Chrome/Chromebook window-manager minimums may enforce larger dimensions; small-screen CSS adapts the app to available space.
+- Press **Alt** by itself in the main website or mini-window to close/reopen it. Chrome or your operating system may intercept Alt for menu shortcuts, and the shortcut never works in unrelated tabs/programs. Right-click is no longer hijacked; the normal browser context menu works.
+- While **Stealth Mode** is on, press **Space** (outside text inputs, drop-downs, or code editors) for the panic action. It closes the popup and redirects the parent page to Google Classroom. Space continues typing normally inside editable fields. The old triple-click shortcut has been removed.
+
+### Two downloadable AI modes
+
+- **Free Browser AI** is **text-only**; **Screen**, **Box Capture**, and **Image** are visually dimmed and disabled while selected. In the Ask tab, change the Free AI strength using **Lightweight**, **Balanced** or **Stronger**; the app asks before loading/downloading a different model. Settings still includes the compatibility check and progress display.
+- **Browser Vision AI** is a second **experimental, browser-downloaded model**, **Phi-3.5 Vision 4-bit**, from WebLLM's [prebuilt model catalog](https://github.com/mlc-ai/web-llm/blob/main/src/config.ts). Unlike the first browser engine it supports images, at a cost of approximately **4.5 GB of GPU memory**, plus substantial model downloads/browser storage. No EXE, Ollama installation, or Gemini key is required. It uses WebGPU and may not run on a school Chromebook or resource-limited GPU. Downloading requires a user click/confirmation. Real model download and image inference have not been verified in a school environment.
+
+### Live Box Capture
+
+- First press requires Chrome's native `getDisplayMedia()` source-selection and user consent. While that stream remains live, **Box Capture** opens a **live video preview of the consented screen/tab**; drag a rectangular selection. On mouse release, the app crops the current frame and **automatically sends** the selected image with your typed question (or a default question if blank). There is no separate “Use selected box” confirmation.
+- This remains inside the AI in a Bottle webpage/popup. A GitHub Pages website cannot draw a draggable overlay directly over unrelated tabs/apps or bypass Chrome's screen-sharing chooser. Use a browser extension or native app for OS-level capture behavior. **Stop Sharing** ends the session and the next attempt again requires consent. [MDN Screen Capture](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getDisplayMedia).
+
+### CodeHS-style JavaScript Console and Graphics
+
+- **Tools → Code Scanner → JavaScript Console** accepts `console.log`, `println`, `print`, `readLine`, `readBoolean`, `readInt`, `readFloat`, and `Randomizer`. For security it uses a stoppable Worker with no access to the app's API key and networking disabled. Input prompts using quoted literal questions, such as `readBoolean("Do you like ice cream?")`, are gathered before launching the Worker. Complex dynamic input prompts and some CodeHS library functions are not supported; the tool implements a subset, not the entire CodeHS library.
+- **JavaScript Graphics** is a separate Code Scanner language. Its canvas runner supports `Rectangle`, `Circle`, `Oval`, `Line`, `Text`, `add`, `remove`, `removeAll`, `getWidth`, `getHeight`, `Color`, `mouseClickMethod`, `keyDownMethod`, `setTimer` and other basic helpers. It runs in an iframe with an opaque origin and network-blocking CSP, unlike a system terminal. Use Run/Stop and see console output beside the preview. See [CodeHS JavaScript docs](https://codehs.com/editor/documentation/js) for the language's native environment; this implementation is an independently written compatible subset.
