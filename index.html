@@ -20,7 +20,7 @@
 .run{cursor:pointer;display:block;margin:0 auto;width:185px;height:61px;border:2px solid #f0d48e;border-radius:5px;background:linear-gradient(#345d57,#183e45);box-shadow:0 5px 0 #0b2c30,0 10px 20px #66502f46;color:#ffe6b4;font:bold 20px Georgia,serif;letter-spacing:4px;transition:transform .15s,filter .15s}.run:hover{filter:brightness(1.17);transform:translateY(-2px)}.run:active{transform:translateY(3px);box-shadow:0 2px 0 #0b2c30}
 .mode{margin-top:27px;display:flex;gap:10px;justify-content:center;align-items:center;cursor:pointer;user-select:none;font:700 12px system-ui,sans-serif;color:#564633;letter-spacing:1.2px}.mode input{width:16px;height:16px;accent-color:#1b545a;cursor:pointer}.mode strong{font-size:17px;font-family:Georgia,serif}
 #fallback{display:none;position:fixed;z-index:20;inset:0;background:#081e29a3;align-items:flex-start;justify-content:center;padding:18px;overflow:auto}
-#fallback.active{display:flex}#fallbackShell{width:435px;max-width:100%;height:650px;max-height:calc(100vh - 36px);box-shadow:0 24px 70px #06151bc4;position:relative;overflow:hidden;border-radius:12px}
+#fallback.active{display:flex}#fallback.quick-hidden{opacity:0;pointer-events:none;transition:opacity .13s ease}#fallbackShell{width:435px;max-width:100%;height:650px;max-height:calc(100vh - 36px);box-shadow:0 24px 70px #06151bc4;position:relative;overflow:hidden;border-radius:12px}
 #fallbackClose{position:absolute;z-index:10;right:7px;top:7px;cursor:pointer;background:#bf7455;color:white;border:none;border-radius:5px;padding:3px 8px}
 @media(max-width:520px){.board{padding:40px 20px 45px}.board img{height:105px}.outer{padding:20px 10px}}
 </style>
@@ -50,6 +50,60 @@
 .card label.quota-edit{font:800 11px system-ui;color:#49635b}.quota-edit span{display:block}.quota-edit small{display:block;color:#806d58;font:500 8px system-ui;margin-top:3px}.card .quota-edit input{font-variant-numeric:tabular-nums;margin:5px 0 0;padding:6px 4px;text-align:center;font-size:14px;width:100%}
 .quota-all{display:grid;gap:6px;margin:10px 0}.quota-meter-row{--edgetone:#269b88;border-radius:5px;padding:6px 7px;background:#fff9ed;border:1px solid #ccb89b}.quota-meter-row.flash{--edgetone:#338fca}.quota-meter-row.pro{--edgetone:#9062c1}.quota-meter-name{font:750 10px system-ui;color:#294b4a;display:flex;justify-content:space-between;gap:6px}.quota-meter-name span:first-child{color:var(--edgetone)}.quota-meter-track{height:6px;border-radius:100px;background:#e4d7be;overflow:hidden;margin-top:5px}.quota-meter-track i{height:100%;display:block;background:var(--edgetone);border-radius:100px;transition:width .65s ease}
 @media(prefers-reduced-motion:reduce){.quota-fill,.quota-meter-track i{transition:none}}
+
+/* Fluid mini-window: reflow as browser popup is resized, including very short windows. */
+html,body{min-width:0;min-height:0}
+.minibody{min-height:0;height:100vh;height:100dvh;min-width:0}
+.bar,.nav,.quota-compact,.foot,.composer{min-width:0}
+.brand h2{font-size:clamp(13px,5vw,21px);overflow-wrap:anywhere}
+.brand small{white-space:normal}
+.nav{min-width:0}.nav button{min-width:0;white-space:normal;overflow-wrap:anywhere}
+.main,.view,.chat,.panel,.composer,.quota-compact{min-width:0}
+.chat{min-height:0}.msg{min-width:0}
+.quota-head,.quota-row{flex-wrap:wrap}.quota-head-label{min-width:0;overflow-wrap:anywhere}
+.quota-tabs{flex-wrap:wrap}.quota-sub{white-space:nowrap}
+.entry,.actions{min-width:0}
+@media(max-width:370px){
+ .bar{gap:7px;padding:5px 7px;min-height:51px}.logo{height:37px;width:34px}
+ .brand h2{letter-spacing:-.6px}.brand small{letter-spacing:.3px;font-size:8px}
+ .net{font-size:9px}.nav button{font-size:10px;letter-spacing:0;padding:8px 1px}
+ .quota-compact{padding:7px 8px}.quota-number{font-size:12px}.quota-notice{font-size:8px}
+ .quota-chip{font-size:9px;padding:3px 5px}.composer{padding:6px}.entry{gap:5px}
+ .send{width:54px;flex:0 0 54px;font-size:10px}.entry textarea{padding:7px;font-size:11px;min-height:43px}
+ .actions{flex-wrap:wrap}.actions .left{flex-wrap:wrap}.small{padding:5px 6px;font-size:9px}
+ .quota-config-grid{gap:4px}.quota-edit{padding:5px 3px}.quota-edit small{font-size:7px}
+ .panel{padding:9px 8px 16px}.card{padding:8px}.row2{flex-wrap:wrap}
+}
+@media(max-width:275px){
+ .brand small,.net{display:none}.bar{gap:4px}.brand h2{font-size:14px}
+ .nav button{font-size:9px;letter-spacing:-.3px}.quota-chip{font-size:8px}
+ .quota-config-grid{grid-template-columns:1fr}.quota-edit{display:flex!important;align-items:center;justify-content:space-between;gap:5px}
+ .quota-edit input{max-width:80px}.actions{gap:4px}.sail{display:none}
+}
+@media(max-height:570px){
+ .bar{min-height:46px;padding-top:4px;padding-bottom:4px}.logo{height:33px;width:30px}
+ .nav button{padding-top:7px;padding-bottom:7px}
+ .quota-compact{padding-top:6px;padding-bottom:6px}.quota-notice{display:none}
+ .quota-rail{height:7px}.quota-row{margin-top:4px}
+ .composer{padding-top:5px;padding-bottom:5px}.attach{margin-bottom:4px;min-height:0}
+ .entry textarea{min-height:38px}.actions{margin-top:4px}
+ .foot{padding:4px 7px}.chat{padding-top:7px;gap:6px}
+}
+@media(max-height:380px){
+ .brand small,.quota-day,.foot{display:none}
+ .bar{min-height:34px}.logo{height:25px;width:24px}.brand h2{font-size:14px}
+ .nav button{padding:5px 1px}.quota-head{margin-bottom:3px}.quota-compact{padding:4px 7px}
+ .quota-rail{height:5px}.quota-chip{padding:1px 5px}
+ .quota-compact .quota-notice{display:none}.chat{min-height:0;padding:4px 7px}
+ .composer{padding:3px 5px}.entry textarea{min-height:30px;max-height:60px}
+ .actions{gap:3px}.small{padding:4px}.panel{padding:7px}
+}
+@media(max-height:265px){.quota-compact{display:none}.attach{display:none}.bar{min-height:28px}.composer{padding:3px}}
+/* Browser popup cannot be OS-minimized from a web page. Conceal its contents instantly. */
+html.quick-hidden body{background:#123238}
+html.quick-hidden .minibody{opacity:0;transform:scale(.94);pointer-events:none;transition:opacity .13s ease,transform .13s ease}
+html.quick-hidden body::after{content:'⚓ Hidden  •  Right-click to return';position:fixed;inset:0;display:grid;place-items:center;background:#123238;color:#ecd49f;text-align:center;padding:12px;font:700 12px Georgia,serif;pointer-events:none}
+@media(prefers-reduced-motion:reduce){html.quick-hidden .minibody{transition:none}}
 </style>
 </head>
 <body>
@@ -99,7 +153,7 @@ DISPLAY(x)</textarea><button id="traceBtn" class="cta">Trace program</button><di
   <div class="quota-all" id="quotaAll" aria-live="polite"></div>
   <p class="hint">Find your real per-model RPD limits at <a href="https://aistudio.google.com/rate-limit" target="_blank" rel="noreferrer">AI Studio → Rate limits</a> and enter suitably conservative numbers here. Counters don't include requests from other apps or devices, and may reset if browser storage is cleared.</p>
   <p class="hint" id="routeStats" aria-live="polite">No successful online requests yet.</p>
-</div><p class="hint">The Remember option saves your key in browser storage, NOT in this HTML file. Browser storage can be read by other users of this browser profile. Do NOT remember a key on shared or school computers. Closing a private window, clearing site data, or moving the file may erase it.</p></div><p class="hint">A single HTML cannot contain a large general-purpose AI model. Offline tools are built-in reference solvers; online answers require the Google API and your free-tier project.</p></div><div class="card"><h4>About this voyage</h4><p>Everything in the interface, illustration and offline learning tools is embedded in this one file. No executable, installer or external UI library.</p><p>For screenshot answers, turn on Online AI, add a key, then capture or upload a picture.</p><p class="hint">Browser screen sharing requires permission and may be disabled by school policy. A floating browser popup cannot stay on top of unrelated apps.</p></div></div></section>
+</div><p class="hint">The Remember option saves your key in browser storage, NOT in this HTML file. Browser storage can be read by other users of this browser profile. Do NOT remember a key on shared or school computers. Closing a private window, clearing site data, or moving the file may erase it.</p></div><p class="hint">A single HTML cannot contain a large general-purpose AI model. Offline tools are built-in reference solvers; online answers require the Google API and your free-tier project.</p></div><div class="card"><h4>About this voyage</h4><p>Everything in the interface, illustration and offline learning tools is embedded in this one file. No executable, installer or external UI library.</p><p>For screenshot answers, turn on Online AI, add a key, then capture or upload a picture.</p><p class="hint">Browser screen sharing requires permission and may be disabled by school policy. A floating browser popup cannot stay on top of unrelated apps. Right-click anywhere in this app to conceal or restore its contents. While Stealth Mode is enabled, three fast left-clicks anywhere inside the app open Google Classroom. Browser shortcuts cannot detect clicks in other programs.</p></div></div></section>
 </main>
 <footer class="foot"><span>☸ AP CSP • Free-tier smart routing</span><span id="status">Ready to sail</span></footer>
 </div>
@@ -110,22 +164,63 @@ const BOTTLE='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHL
 const CLASSROOM='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACcUlEQVR42u1Zv2sUURD+XvzFroXG3GEgKBEUf1yKqFga1H9ByAUsJKWNrZ1B0H/ATiRaaGUbCIKdpBBNI15EJBCxiClC9DR7SQp3LPbde7M7b++28/buTTU7++Pdm+/7Zmb31PL0GKHENoSSm9+A34DfgN/A/7X9rmDlUmD84bNR4ijbLpQq9nBq30IsT5TczJsPxTpG/MHaj23s1+ohAMDWx6jPERi71rR5oEhnneVMdWjexBFQ6WyybINlu31dCgGNGjEEguOhRsCLuMcphL8tZBX7qVUxoZXdqhQzZYTLDoiksClmwVjeWwt+AgAmwia7bqdNpn5HgAtMp7bRqprYq61zWW1a8bI0hgcCke3tvW0HArGOxSZUr5BG4rfzd3kR9zSFyAEVGOQc6qwdPhgaf+7GPdEb5t48Sqi0G7H18sWe02IGCAHlyIhFQCJ1e3LG+ONHT4jzs5dvAQAeLz1x1FZyFAXlRVz2PqAHrZhTiHJl9Xz5paXQ8Elxfv79C1kUjIipI6tcKh4AEVMnEUvj5fH+64cis9Fe5Mg25ddOSDZ4EZdMxHL8dVFoYvR8MnyNXhAxbo0fnwEA7759MLG1zTVJq9gxFfRjHyg8C6XLaHJw9+odE7t+ZqrQgjWNSv3iTRNbaCwCAJ4uPevMBt+JS0Mh9inDTnOyExelTTc7dWw8lzppEQ9OGR0SA0gtsF8H6iPfk5L4Zb7QItTlT6wo2gAAzFTXrdjDPxJ5L+JS9gHKQMr9zQfFViHHcJZ6+UpiVyryusHsxOtvbfjI6fzRGapbtouacry8yIc3V72IS0Kh5lfF/H0eAb8Bv4Eetn828hfgZAMhJAAAAABJRU5ErkJggg==';
 const CLASSROOM_URL='https://classroom.google.com/u/3/h/st';
 const $=id=>document.getElementById(id);
-let miniWindow=null, stealth=false;
+let miniWindow=null, stealth=false, quickHidden=false;
+let panicClicks=[];
 function setStealth(on){stealth=on;if(!on){document.title='AI in a Bottle';$('tabIcon').href=BOTTLE}}
 function applyStealthTab(){document.title=stealth?'Home - Classroom':'AI in a Bottle';$('tabIcon').href=stealth?CLASSROOM:BOTTLE}
 $('stealth').addEventListener('change',e=>setStealth(e.target.checked));
-function panic(){if(!stealth)return;try{if(miniWindow&&!miniWindow.closed)miniWindow.close()}catch(e){}location.replace(CLASSROOM_URL)}
-function bindPanic(win){let queue=[];win.addEventListener('click',()=>{if(!stealth)return;let t=Date.now();queue.push(t);queue=queue.filter(x=>t-x<720);if(queue.length>=3){queue=[];panic()}},true)}
-bindPanic(window);
+function panic(){
+ if(!stealth)return;
+ try{if(miniWindow&&!miniWindow.closed)miniWindow.close()}catch(e){}
+ // The parent page is the actual tab: navigate it directly to Google Classroom.
+ location.replace(CLASSROOM_URL);
+}
+function setQuickHidden(hidden){
+ quickHidden=hidden;
+ const fallback=$('fallback');
+ fallback.classList.toggle('quick-hidden',quickHidden);
+ if(miniWindow&&!miniWindow.closed){
+   try{
+     miniWindow.document.documentElement.classList.toggle('quick-hidden',quickHidden);
+     if(quickHidden){miniWindow.blur();window.focus()}else{miniWindow.focus()}
+   }catch(e){}
+ }
+}
+function toggleQuickHide(){
+ const fallbackVisible=$('fallback').classList.contains('active');
+ if((!miniWindow||miniWindow.closed)&&!fallbackVisible)return;
+ setQuickHidden(!quickHidden);
+}
+// Listeners are installed in both documents. The shared click queue means that
+// three quick clicks can cross between the parent page and its popup.
+function bindShortcuts(win){
+ const doc=win.document;
+ if(doc.__aiBottleShortcutsBound)return;
+ doc.__aiBottleShortcutsBound=true;
+ doc.addEventListener('pointerdown',event=>{
+   if(event.button!==0||!stealth)return;
+   const now=Date.now();
+   panicClicks.push(now);
+   panicClicks=panicClicks.filter(t=>now-t<=850);
+   if(panicClicks.length>=3){panicClicks=[];event.preventDefault();panic()}
+ },true);
+ doc.addEventListener('contextmenu',event=>{
+   if(event.button!==2 && event.pointerType==='touch')return;
+   // Right click works in Ask, Study, Tools, Config, the home page and popup.
+   event.preventDefault();
+   toggleQuickHide();
+ },true);
+}
+bindShortcuts(window);
 function run(){
  applyStealthTab();
- if(miniWindow&&!miniWindow.closed){miniWindow.focus();return}
+ if(miniWindow&&!miniWindow.closed){setQuickHidden(false);miniWindow.focus();return}
  let pop=null;try{pop=window.open('','AIInABottle','popup=yes,width=438,height=690,top=110,left=180,resizable=yes,scrollbars=no')}catch(e){}
  if(pop){
    miniWindow=pop;pop.document.open();pop.document.write('<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+ (stealth?'Home - Classroom':'AI in a Bottle') +'</title><link rel="icon" href="'+(stealth?CLASSROOM:BOTTLE)+'"><style>'+ $('miniStyles').textContent+'</style></head><body>'+ $('miniTemplate').innerHTML+'</body></html>');pop.document.close();
-   bindPanic(pop);bootMini(pop);
+   bindShortcuts(pop);setQuickHidden(false);bootMini(pop);
    pop.focus();
- }else{$('miniStyles').media='all';const target=$('fallbackTarget');target.innerHTML=$('miniTemplate').innerHTML;const panel=$('fallback');panel.classList.add('active');$('fallbackClose').onclick=()=>{panel.classList.remove('active');target.innerHTML='';$('miniStyles').media='not all'};bootMini(window,target)}
+ }else{$('miniStyles').media='all';const target=$('fallbackTarget');target.innerHTML=$('miniTemplate').innerHTML;const panel=$('fallback');panel.classList.add('active');setQuickHidden(false);$('fallbackClose').onclick=()=>{panel.classList.remove('active');setQuickHidden(false);target.innerHTML='';$('miniStyles').media='not all'};bootMini(window,target)}
 }
 $('run').addEventListener('click',run);
 
