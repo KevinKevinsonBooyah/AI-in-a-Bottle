@@ -30,3 +30,13 @@ Create an API key in [Google AI Studio](https://aistudio.google.com/api-keys), t
 **Privacy and security:** This is a public static website. Do not share your API key. If you choose to remember it, the browser stores the key locally in unencrypted web storage. Other GitHub Pages apps under the same `kevinkevinsonbooyah.github.io` origin can potentially read that storage. Avoid saving the key on school/shared computers; revoke it from AI Studio if you suspect exposure.
 
 Some browser settings or school restrictions can block popups, screenshot permissions, or external AI requests.
+
+## Controls & new features
+
+- **Resize the mini-window:** layout automatically adapts to narrow and short sizes (the browser's own window frame is still controlled by Chrome).
+- **Right-click anywhere on either AI in a Bottle page or its mini-window:** quickly conceal or reveal the mini-window's contents in *any* mode. A website cannot minimize the operating system window or detect right-clicks in unrelated tabs/programs.
+- **Triple left-click while Stealth Mode is enabled:** navigates the **main** AI in a Bottle tab to the configured Google Classroom address. Listeners work across both of this app's windows, but not outside them.
+- **Box Capture:** Chrome asks you to pick a screen/tab, then you drag a rectangular crop over the screenshot and click **Use selected box**. Requires browser screen-sharing permission; nothing is uploaded until you ask a model to interpret the screenshot.
+- **Local Ollama:** in **Config → Choose the brain**, select **Local • Ollama**. This restores the original ScreenStudy's local `qwen3-vl:4b-instruct` model if installed. Set the model name if you already have a different compatible model, then click **Test local connection**. No Gemini API quota applies to local Ollama. The target computer must have Ollama installed and running; this **will not** work on a school computer that cannot install Ollama.
+
+For GitHub Pages, Ollama might block browser-origin requests. If needed, set `OLLAMA_ORIGINS=https://kevinkevinsonbooyah.github.io` in Ollama's environment and restart Ollama (see [official Ollama FAQ](https://github.com/ollama/ollama/blob/main/docs/faq.md)); browser local-network permissions may also be required. Do not publish your local Ollama server to the internet.
