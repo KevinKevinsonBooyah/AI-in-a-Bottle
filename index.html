@@ -516,7 +516,7 @@ function bindShortcuts(win){
    if(stealth && !isEditing && (event.code==='Space'||event.key===' ')){
      event.preventDefault();event.stopImmediatePropagation();panic();return;
    }
-   if(!isEditing && event.key==='Alt' && !event.shiftKey){
+   if(event.key==='Alt' && !event.shiftKey){
      event.preventDefault();event.stopImmediatePropagation();toggleQuickHide();return;
    }
  },true);
@@ -810,7 +810,15 @@ function bootMini(win,root){
   catch(e){q('browserReady').textContent='Could not load AI: '+(e?.message||'Unknown error')+' Try Lightweight or check school network restrictions.';setStatus('Browser AI failed to load');throw e;}
   finally{browserLoading=null;btn.disabled=!browserCompatible;}
  }
- q('browserDownload').onclick=()=>loadBrowserModel().catch(()=>{});
+ q('browserDownload').onclick=()=>{
+   const selected=q('browserModel').value;
+   if(!(browserEngine&&browserLoadedModel===selected)){
+     const label=BROWSER_MODELS[selected]?.level||'Local AI';
+     const requirement=BROWSER_MODELS[selected]?.memory||'unknown';
+     if(!win.confirm('Download or load '+label+' browser AI?\n\nThis may download several gigabytes of model files into Chrome. It uses about '+requirement+' GB of GPU memory.\n\nContinue?'))return;
+   }
+   loadBrowserModel().catch(()=>{});
+ };
  q('browserQuickModel').onchange=async()=>{
    if(q('engine').value!=='browser')return;
    const newModel=q('browserQuickModel').value;
@@ -849,6 +857,7 @@ function bootMini(win,root){
  q('engine').onchange=()=>{
  const mode=q('engine').value,online=mode==='gemini',local=mode==='ollama',browser=mode==='browser',vision=mode==='browser-vision';
  const localBrowser=browser||vision;
+ const previousModel=q('browserModel').value;
  if(browser){
    if(q('browserModel').value==='Phi-3.5-vision-instruct-q4f16_1-MLC')q('browserModel').value=lastFreeBrowserModel;
    q('browserQuickModel').value=q('browserModel').value;
@@ -857,6 +866,7 @@ function bootMini(win,root){
    q('browserModel').value='Phi-3.5-vision-instruct-q4f16_1-MLC';
  }
  for(const opt of q('browserModel').options){opt.hidden=vision?opt.value!=='Phi-3.5-vision-instruct-q4f16_1-MLC':opt.value==='Phi-3.5-vision-instruct-q4f16_1-MLC';}
+ if(previousModel!==q('browserModel').value){browserCompatible=false;q('browserDownload').disabled=true;displayBrowserResult('Model changed. Check Compatibility before downloading this model.');}
  q('onlineConfig').style.display=online?'block':'none';
  q('ollamaConfig').style.display=local?'block':'none';
  q('browserAIConfig').style.display=localBrowser?'block':'none';
@@ -1099,7 +1109,7 @@ exit /b 1
       if(f.size>64000)throw Error('Config file is too large.');
       const config=JSON.parse(await f.text());
       if(!config||config.app!=='AI in a Bottle'||config.formatVersion!==2)throw Error('Not an AI in a Bottle config file.');
-      const engines=['browser','gemini','ollama'],modes=['smart','fast','balanced','deep'];
+      const engines=['browser','browser-vision','gemini','ollama'],modes=['smart','fast','balanced','deep'];
       if(engines.includes(config.engine))q('engine').value=config.engine;
       if(modes.includes(config.modelMode))q('model').value=config.modelMode;
       if(typeof config.browserModel==='string'&&Object.hasOwn(BROWSER_MODELS,config.browserModel))q('browserModel').value=config.browserModel;
