@@ -266,6 +266,47 @@ html,body{min-width:0;min-height:0}
 .minibody.is-stealth .browser-ai-steps span,.minibody.is-stealth .browser-ai-result,.minibody.is-stealth .browser-ai-progress{background:#163c48;border-color:#2f807e;color:#c5eee5}
 .minibody.is-stealth .browser-ai-progress-head{color:#d4fae7}
 @media(prefers-reduced-motion:reduce){#browserProgressFill{transition:none}}
+
+/* Code Scanner — responsive editor, output console and isolated HTML preview */
+.code-scanner{border-color:#4d8b88;background:linear-gradient(155deg,#f5ebd7,#e5d9c2)}
+.scanner-heading{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:7px}
+.scanner-heading h4{margin:0}.scanner-heading span{font:700 9px system-ui;color:#43726d;letter-spacing:.6px}
+.scanner-toolbar{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}
+.scanner-toolbar button{flex:1;min-width:74px;padding:9px 6px}
+.card textarea.scanner-editor{display:block;width:100%;height:155px;min-height:92px;padding:10px;margin:7px 0 0;resize:vertical;border:1px solid #457579;border-radius:7px;background:#132935;color:#d5ffec;font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;tab-size:2;white-space:pre;overflow:auto;outline:none}
+.card textarea.scanner-editor:focus{border-color:#2bafa1;box-shadow:0 0 0 2px #49baad3a}
+.scanner-consolebar{display:flex;align-items:center;gap:6px;margin-top:10px;background:#0c2730;border:1px solid #274c53;border-bottom:none;padding:5px 8px;border-radius:7px 7px 0 0;color:#bffbe6;font:700 10px system-ui;letter-spacing:.6px}
+.scanner-consolebar b{flex:1;min-width:0}.scanner-consolebar button{background:#214753;color:#c6f6e9;border:1px solid #3b7075;border-radius:4px;padding:4px 7px;font:700 10px system-ui;cursor:pointer}
+.scanner-output{margin:0;min-height:82px;max-height:210px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#071f28;color:#a7f7d1;border:1px solid #274c53;border-radius:0 0 7px 7px;padding:10px;font:11px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}
+.scanner-preview{margin-top:10px;border:1px solid #629b95;border-radius:7px;overflow:hidden;background:#fff}
+.scanner-preview b{display:block;padding:6px 9px;background:#153e4b;color:#c9f2e8;font:700 10px system-ui}
+.scanner-preview iframe{display:block;border:0;background:#fff;width:100%;height:175px;min-height:110px}
+@media(max-width:340px){.scanner-heading span{display:none}.scanner-toolbar button{font-size:10px;min-width:63px}}
+/* Ghost Mode palette lock: no brass, parchment, tan, rust, brown, or gold UI accents. */
+.minibody.is-stealth{color-scheme:dark;--ink:#e2fff6;--rust:#59d8cb;--sea:#144a57;--cream:#103744;--moss:#49bea9;--gold:#74e6d5;scrollbar-color:#246978 #071b2a}
+.minibody.is-stealth .logo{filter:grayscale(1) brightness(1.6) sepia(1) hue-rotate(128deg) saturate(3) drop-shadow(0 0 7px #2ac8be55)}
+.minibody.is-stealth .bar,.minibody.is-stealth .composer,.minibody.is-stealth .nav,.minibody.is-stealth .quota-compact{border-color:#328e92!important;box-shadow:0 0 16px #00131d50}
+.minibody.is-stealth .bar .dot{background:#45d9cc}
+.minibody.is-stealth .chat,.minibody.is-stealth .main,.minibody.is-stealth .panel{color:#dff9f1;scrollbar-color:#266978 #092634}
+.minibody.is-stealth .chat .empty,.minibody.is-stealth .muted,.minibody.is-stealth .msg .tag,.minibody.is-stealth .quota-day{color:#91cac7}
+.minibody.is-stealth .tinyX{background:#197c80;color:#ecfffa}
+.minibody.is-stealth .card,.minibody.is-stealth .quota-settings,.minibody.is-stealth .quota-edit,.minibody.is-stealth .quota-meter-row,.minibody.is-stealth .quota-all,.minibody.is-stealth .browser-ai-panel,.minibody.is-stealth .code-scanner{background:#123441!important;border-color:#377f84!important;color:#ddf8f0!important;box-shadow:0 2px 14px #00192357}
+.minibody.is-stealth .card h4,.minibody.is-stealth .card label,.minibody.is-stealth .quota-setting-title,.minibody.is-stealth .quota-meter-name,.minibody.is-stealth .quota-edit small,.minibody.is-stealth .quota-edit span,.minibody.is-stealth .scanner-heading span{color:#b6eee3!important}
+.minibody.is-stealth .card .hint,.minibody.is-stealth .card p,.minibody.is-stealth .card small,.minibody.is-stealth .quota-meter-name span{color:#a1d2cd!important}
+.minibody.is-stealth .quota-setting-title,.minibody.is-stealth .quota-edit,.minibody.is-stealth .quota-meter-row{border-top-color:#54cabb!important}
+.minibody.is-stealth .quota-meter-track,.minibody.is-stealth .quota-rail{background:#082530!important;border-color:#2c7779!important}
+.minibody.is-stealth .quota-chip,.minibody.is-stealth .quota-edit input,.minibody.is-stealth .quota-compact,.minibody.is-stealth .quota-row,.minibody.is-stealth .quota-day{color:#d2fff1!important}
+.minibody.is-stealth .card input,.minibody.is-stealth .card select,.minibody.is-stealth .card textarea,.minibody.is-stealth #traceInput{background:#092e3b!important;color:#d7fbef!important;border-color:#3d8e91!important}
+.minibody.is-stealth .card .result,.minibody.is-stealth #traceResult,.minibody.is-stealth #binaryResult,.minibody.is-stealth #overflowResult,.minibody.is-stealth .quota-notice{background:#0d3240!important;border-color:#397f86!important;color:#d9f9ee!important}
+.minibody.is-stealth .small,.minibody.is-stealth .quick,.minibody.is-stealth .card button.cta,.minibody.is-stealth .card .quick,.minibody.is-stealth .card button:not(.small):not(.quota-chip){background:#165661!important;border-color:#4da49e!important;color:#e4fff6!important}
+.minibody.is-stealth .small:hover,.minibody.is-stealth .quick:hover,.minibody.is-stealth .card button:hover{background:#197483!important}
+.minibody.is-stealth .share-stop{color:#e6fff6!important}
+.minibody.is-stealth .quota-edit.lite,.minibody.is-stealth .quota-edit.flash,.minibody.is-stealth .quota-edit.pro{--edgetone:#56d1c5}
+.minibody.is-stealth .scanner-output,.minibody.is-stealth .scanner-consolebar{background:#061d29;color:#a6f6d4;border-color:#257a81}
+.minibody.is-stealth .scanner-preview{background:#123441;border-color:#4d9f97}.minibody.is-stealth .scanner-preview b{background:#083643;color:#a6f5de}
+.minibody.is-stealth #onlineConfig > .hint,.minibody.is-stealth #onlineConfig > div.hint{background:#113a47!important;color:#b7e4dc!important;border-color:#408d89!important}
+.minibody.is-stealth .quota-compact{background:#0d303d!important}
+.minibody.is-stealth .foot{color:#93c9c0!important}
 </style>
 </head>
 <body>
@@ -286,14 +327,35 @@ html,body{min-width:0;min-height:0}
 </div>
 <div class="chat" id="chat"><div class="empty" id="empty"><div class="art">⚓</div><b>Ahoy, scholar.</b><p>Ask about anything, or attach a question screenshot.</p></div></div>
 <div class="composer"><div class="attach" id="attach"><span class="muted">Paste an image, upload one, or capture a screen.</span></div><div class="entry"><textarea id="prompt" placeholder="What would you like to know?" aria-label="Your question"></textarea><button id="send" class="send">ASK ↗</button></div><div class="actions"><div class="left"><button id="screenshot" class="small" title="Capture the whole screen or tab">▧ Screen</button><button id="boxCapture" class="small" title="After sharing a screen once, drag a box around the question. You can take more captures without choosing again.">▣ Box Capture</button><button id="stopShare" class="small share-stop" style="display:none" title="Stop sharing your screen">■ Stop Sharing</button><button id="upload" class="small">＋ Image</button><button id="cancel" class="small" style="display:none">■ Stop</button><input id="file" type="file" accept="image/*" hidden></div><button id="clear" class="small">Clear log</button></div></div></section>
-<section class="view" id="v-study"><div class="panel"><h3>Quick Practice</h3><p class="lead">Short questions in math, science, English, history, and computing.</p><div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><h4 id="quizArea">Data • Binary</h4><span class="muted" id="quizCount">1 / 18</span></div><div class="question" id="quizQuestion"></div><div class="choices" id="quizChoices"></div><div class="result" id="quizExplain" style="display:none"></div><button class="cta" id="next" style="margin-top:10px">Next challenge →</button></div><div class="card"><h4>What’s included?</h4><p>Math • Science • English • History • Geography • AP Computer Science.</p><p class="hint">Practice is a small offline quiz, not a replacement for the online AI.</p></div></div></section>
-<section class="view" id="v-tools"><div class="panel"><h3>Navigator's Tools</h3><p class="lead">Useful offline number and code tools.</p><div class="card"><h4>Binary converter</h4><label for="binary">Enter decimal or binary</label><input id="binary" placeholder="e.g. 151 or 10010101"><div class="row2"><button class="quick" id="toBinary">Decimal → Binary</button><button class="quick" id="toDecimal">Binary → Decimal</button></div><div class="result" id="binaryResult" style="margin-top:10px">Enter a number to convert it.</div></div><div class="card"><h4>Overflow checker</h4><div class="row2"><div><label>First integer</label><input id="addA" type="number" value="14"></div><div><label>Second integer</label><input id="addB" type="number" value="15"></div><div><label>Bits</label><input id="bits" type="number" min="1" max="32" value="4"></div></div><button id="checkBits" class="cta">Check overflow</button><div class="result" id="overflowResult" style="margin-top:10px">4-bit values hold 0 through 15 (unsigned).</div></div><div class="card"><h4>Pseudocode trace</h4><p class="hint">Use AP-style assignments (←), DISPLAY, and REPEAT n TIMES { … }.</p><textarea id="traceInput" style="width:100%;height:103px;background:#fffaf0;border:1px solid #af9670;border-radius:5px;padding:8px;font:11px/1.5 monospace;color:#243c3c;resize:vertical">x ← 3
+<section class="view" id="v-study"><div class="panel"><h3>Quick Practice</h3><p class="lead">Short questions in math, science, English, history, and computing.</p><div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><h4 id="quizArea">Data • Binary</h4><span class="muted" id="quizCount">1 / 18</span></div><div class="question" id="quizQuestion"></div><div class="choices" id="quizChoices"></div><div class="result" id="quizExplain" style="display:none"></div><button class="cta" id="next" style="margin-top:10px">Next challenge →</button></div><div class="card"><h4>What’s included?</h4><p>Math • Science • English • History • Geography • AP Computer Science.</p><p class="hint">Practice includes built-in questions; the AI engine is separate.</p></div></div></section>
+<section class="view" id="v-tools"><div class="panel"><h3>Navigator's Tools</h3><p class="lead">Run code, preview websites, and explore number tools.</p>
+<div class="card code-scanner" id="codeScanner">
+ <div class="scanner-heading"><h4>⌘ Code Scanner</h4><span>Run · Inspect · Debug</span></div>
+ <p class="hint">Run JavaScript in an isolated console, preview websites, or try other languages. This is a browser sandbox, not a Windows/Linux terminal.</p>
+ <label for="scanLang">Language</label>
+ <select id="scanLang" aria-label="Programming language">
+  <option value="javascript">JavaScript · Console</option>
+  <option value="html">HTML · Live preview</option>
+  <option value="css">CSS · Live preview</option>
+  <option value="typescript">TypeScript · Console</option>
+  <option value="python">Python · Pyodide</option>
+  <option value="sql">SQL · SQLite</option>
+  <option value="json">JSON · Validator</option>
+  <option value="pseudo">AP Pseudocode · Trace</option>
+ </select>
+ <div class="scanner-toolbar"><button class="cta" id="scanRun" type="button">▶ Run code</button><button class="quick" id="scanStop" type="button" disabled>■ Stop</button><button class="quick" id="scanExample" type="button">Example</button></div>
+ <textarea id="scanInput" class="scanner-editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Code editor">console.log("Ahoy from JavaScript!");&#10;const numbers = [2, 4, 6];&#10;console.table(numbers.map(n =&gt; ({ n, square: n*n })));</textarea>
+ <div class="scanner-consolebar"><b>TERMINAL OUTPUT</b><button type="button" id="scanClear">Clear</button><button type="button" id="scanCopy">Copy</button></div>
+ <pre id="scanOutput" class="scanner-output" aria-live="polite">Ready. Choose a language and press Run code.</pre>
+ <div class="scanner-preview" id="scanPreviewWrap" hidden><b>LIVE PREVIEW</b><iframe id="scanPreview" title="Sandboxed code preview" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe></div>
+ <p class="hint" id="scanHint">JavaScript runs in a separate worker with console output, async/await, and a Stop button. Network requests are disabled for this runner.</p>
+</div><div class="card"><h4>Binary converter</h4><label for="binary">Enter decimal or binary</label><input id="binary" placeholder="e.g. 151 or 10010101"><div class="row2"><button class="quick" id="toBinary">Decimal → Binary</button><button class="quick" id="toDecimal">Binary → Decimal</button></div><div class="result" id="binaryResult" style="margin-top:10px">Enter a number to convert it.</div></div><div class="card"><h4>Overflow checker</h4><div class="row2"><div><label>First integer</label><input id="addA" type="number" value="14"></div><div><label>Second integer</label><input id="addB" type="number" value="15"></div><div><label>Bits</label><input id="bits" type="number" min="1" max="32" value="4"></div></div><button id="checkBits" class="cta">Check overflow</button><div class="result" id="overflowResult" style="margin-top:10px">4-bit values hold 0 through 15 (unsigned).</div></div><div class="card"><h4>Pseudocode trace</h4><p class="hint">Use AP-style assignments (←), DISPLAY, and REPEAT n TIMES { … }.</p><textarea id="traceInput" style="width:100%;height:103px;background:#fffaf0;border:1px solid #af9670;border-radius:5px;padding:8px;font:11px/1.5 monospace;color:#243c3c;resize:vertical">x ← 3
 REPEAT 4 TIMES
 {
  x ← x + 2
 }
 DISPLAY(x)</textarea><button id="traceBtn" class="cta">Trace program</button><div class="result" id="traceResult" style="margin-top:10px">Results will appear here.</div></div></div></section>
-<section class="view" id="v-settings"><div class="panel"><h3>Settings</h3><p class="lead">Choose your AI and adjust the limits.</p><div class="card conf-card"><h4>⚓ Move your settings</h4><p class="hint">Export or import AI choices and request limits. Your Gemini API key is <strong>never</strong> included.</p><div class="row2"><button type="button" class="cta" id="exportConfig">⬇ Export Config</button><button type="button" class="quick" id="importConfig">⬆ Import Config</button></div><input type="file" id="configFile" accept=".json,application/json" hidden><p id="configStatus" class="hint" role="status"></p></div><div class="card"><h4>AI engine</h4><label for="engine">How to answer</label><select id="engine"><option value="offline">Offline • basic tools only</option><option value="browser">Free Browser AI • no key, unlimited</option><option value="gemini">Gemini • online AI</option><option value="ollama">Ollama • local AI (PC only)</option></select><div id="onlineConfig" style="display:none"><label for="key">Google AI Studio API key</label><input id="key" type="password" autocomplete="off" placeholder="Paste your Gemini API key">
+<section class="view" id="v-settings"><div class="panel"><h3>Settings</h3><p class="lead">Choose your AI and adjust the limits.</p><div class="card conf-card"><h4>⚓ Move your settings</h4><p class="hint">Export or import AI choices and request limits. Your Gemini API key is <strong>never</strong> included.</p><div class="row2"><button type="button" class="cta" id="exportConfig">⬇ Export Config</button><button type="button" class="quick" id="importConfig">⬆ Import Config</button></div><input type="file" id="configFile" accept=".json,application/json" hidden><p id="configStatus" class="hint" role="status"></p></div><div class="card"><h4>AI engine</h4><label for="engine">How to answer</label><select id="engine"><option value="browser">Free Browser AI • no key, unlimited</option><option value="gemini">Gemini • online AI</option><option value="ollama">Ollama • local AI (PC only)</option></select><div id="onlineConfig" style="display:none"><label for="key">Google AI Studio API key</label><input id="key" type="password" autocomplete="off" placeholder="Paste your Gemini API key">
 <p id="keyStatus" class="hint" role="status">Key stays in this open window only; it is never saved or exported.</p>
 <label for="model">Model quality</label>
 <select id="model"><option value="smart">Auto • picks the best free model</option><option value="fast">Quick • smaller model first</option><option value="balanced">Balanced • standard model first</option><option value="deep">Deep • stronger model when available</option></select>
@@ -464,7 +526,7 @@ function bootMini(win,root){
   if(sessionSettings){
     try{
       for(const [id,val] of [['engine',sessionSettings.engine],['model',sessionSettings.model],['key',sessionSettings.key],['ollamaHost',sessionSettings.host],['ollamaModel',sessionSettings.localModel],['browserModel',sessionSettings.browserModel]]){
-        if(q(id)&&val)q(id).value=val;
+        if(q(id)&&val)q(id).value=(id==='engine'&&val==='offline')?'browser':val;
       }
     }catch(e){}
   }
@@ -685,8 +747,8 @@ function bootMini(win,root){
  const mode=q('engine').value,online=mode==='gemini',local=mode==='ollama',browser=mode==='browser';
  q('onlineConfig').style.display=online?'block':'none';q('ollamaConfig').style.display=local?'block':'none';q('browserAIConfig').style.display=browser?'block':'none';q('quotaCompact').style.display=online?'block':'none';
  q('net').classList.toggle('online',online||local||browser);
- q('netLabel').textContent=browser?'Browser AI':local?'Local AI':online?'Gemini AI':'Offline';
- setStatus(browser?(browserEngine&&browserLoadedModel===q('browserModel').value?'Free Browser AI ready':'Free Browser AI: check compatibility'):local?'Ollama must be running on this PC':online?'Gemini online ready':'Offline tools ready');
+ q('netLabel').textContent=browser?'Browser AI':local?'Local AI':'Gemini AI';
+ setStatus(browser?(browserEngine&&browserLoadedModel===q('browserModel').value?'Free Browser AI ready':'Free Browser AI: check compatibility'):local?'Ollama must be running on this PC':'Gemini online ready');
 };
  try{const settings=JSON.parse(win.localStorage.getItem('ai-bottle:ollama-settings')||'null');if(settings){if(settings.host)q('ollamaHost').value=settings.host;if(settings.model)q('ollamaModel').value=settings.model}}catch(e){}
  ['ollamaHost','ollamaModel'].forEach(id=>q(id).addEventListener('change',()=>{try{win.localStorage.setItem('ai-bottle:ollama-settings',JSON.stringify({host:q('ollamaHost').value,model:q('ollamaModel').value}))}catch(e){}}));
@@ -911,7 +973,7 @@ exit /b 1
       if(f.size>64000)throw Error('Config file is too large.');
       const config=JSON.parse(await f.text());
       if(!config||config.app!=='AI in a Bottle'||config.formatVersion!==2)throw Error('Not an AI in a Bottle config file.');
-      const engines=['offline','browser','gemini','ollama'],modes=['smart','fast','balanced','deep'];
+      const engines=['browser','gemini','ollama'],modes=['smart','fast','balanced','deep'];
       if(engines.includes(config.engine))q('engine').value=config.engine;
       if(modes.includes(config.modelMode))q('model').value=config.modelMode;
       if(typeof config.browserModel==='string'&&Object.hasOwn(BROWSER_MODELS,config.browserModel))q('browserModel').value=config.browserModel;
@@ -1034,7 +1096,7 @@ exit /b 1
    if(!attempted)throw Error('All models are cooling down or have reached this app daily allowance. Adjust your personal limits in Config if your AI Studio quota allows it, or wait for the reset.');
    throw Error('No free-tier model is available right now. '+errors.slice(0,3).join(' | '));
  }
- async function send(){const txt=q('prompt').value.trim(),img=imageData;if(!txt&&!img)return;if(q('send').disabled)return;lastRouteLabel='';q('send').disabled=true;q('cancel').style.display='inline-block';addMsg('user',txt||'[Screenshot question]',img);q('prompt').value='';clearAttached();setStatus('Thinking…');const wait=addMsg('assistant','Working on it…');wait.classList.add('loading');try{let ans,local=simpleAnswer(txt);if(q('engine').value==='browser'){ans=await browserAnswer(txt,img)}else if(q('engine').value==='ollama'){ans=await ollamaAnswer(txt,img)}else if(q('engine').value==='offline'){if(img){ans='This offline HTML cannot read screenshots. Open Config → Online Gemini, add an API key, then send the screenshot again.'}else{ans=local?local.text:'I can solve common AP CSP questions offline (binary, overflow, logic, networking, pseudocode basics), but I cannot reliably reason through this particular question without a connected AI model.\n\nTry the Study tab for drills, or enable Online Gemini in Config.'}}else if(local&&local.type==='exact'&&!img){ans=local.text+'\n\n✓ Verified by the offline calculator.'}else{ans=await onlineAnswer(txt,img)}wait.textContent=ans;if(lastRouteLabel&&(q('engine').value==='browser'||q('engine').value==='ollama'||(q('engine').value==='gemini'&&!(local&&local.type==='exact'&&!img)))){wait.parentNode?.querySelector('.tag')?.append(' · '+lastRouteLabel);setStatus('Answered by '+lastRouteLabel)}else{setStatus('Answer ready • no API request')}lastRouteLabel=''}catch(e){wait.textContent='Could not complete the request: '+(e.name==='AbortError'?'Canceled.':e.message)+'\n\nCheck your selected AI and settings. For Free Browser AI, run Check Compatibility and Download & Start Free AI. Offline tools still work.';setStatus('Connection issue')}finally{wait.classList.remove('loading');q('send').disabled=false;q('cancel').style.display='none';requestCtrl=null;q('chat').scrollTop=q('chat').scrollHeight}}
+ async function send(){const txt=q('prompt').value.trim(),img=imageData;if(!txt&&!img)return;if(q('send').disabled)return;lastRouteLabel='';q('send').disabled=true;q('cancel').style.display='inline-block';addMsg('user',txt||'[Screenshot question]',img);q('prompt').value='';clearAttached();setStatus('Thinking…');const wait=addMsg('assistant','Working on it…');wait.classList.add('loading');try{let ans,local=simpleAnswer(txt);if(q('engine').value==='browser'){ans=await browserAnswer(txt,img)}else if(q('engine').value==='ollama'){ans=await ollamaAnswer(txt,img)}else if(local&&local.type==='exact'&&!img){ans=local.text+'\n\n✓ Verified by the built-in calculator.'}else{ans=await onlineAnswer(txt,img)}wait.textContent=ans;if(lastRouteLabel&&(q('engine').value==='browser'||q('engine').value==='ollama'||(q('engine').value==='gemini'&&!(local&&local.type==='exact'&&!img)))){wait.parentNode?.querySelector('.tag')?.append(' · '+lastRouteLabel);setStatus('Answered by '+lastRouteLabel)}else{setStatus('Answer ready • no API request')}lastRouteLabel=''}catch(e){wait.textContent='Could not complete the request: '+(e.name==='AbortError'?'Canceled.':e.message)+'\n\nCheck your selected AI and settings. For Free Browser AI, run Check Compatibility and Download & Start Free AI. The Tools tab remains available.';setStatus('Connection issue')}finally{wait.classList.remove('loading');q('send').disabled=false;q('cancel').style.display='none';requestCtrl=null;q('chat').scrollTop=q('chat').scrollHeight}}
  // study questions
  const quiz=[
  ['Math','What is 15% of 240?',['24','36','48','60'],1,'0.15 × 240 = 36.'],
