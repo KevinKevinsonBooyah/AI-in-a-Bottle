@@ -335,6 +335,12 @@ body.ghost-popup .crop-buttons button:hover{background:#1b7383}
 .minibody.is-stealth .browser-quickbar select{background:#113f4b;color:#dcf9ed;border-color:#43958f}
 .minibody .actions button:disabled,.minibody .actions button[aria-disabled="true"]{opacity:.32!important;cursor:not-allowed!important;filter:grayscale(1)!important;pointer-events:none!important;box-shadow:none!important}
 @media(max-width:260px){.minibody .bar{min-height:25px}.minibody .nav button{padding:4px 1px;font-size:9px}.minibody .actions{gap:2px}.minibody .actions button{font-size:9px;padding:4px 3px}.minibody .composer{padding:3px}.minibody .entry textarea{min-height:34px}.browser-quickbar{padding:3px 4px}.browser-quickbar select{font-size:10px}}
+
+/* Live Box Capture: video stays live until the user finishes drawing; auto-submit on release. */
+.crop-surface video.crop-live{display:block;max-width:100%;max-height:calc(100dvh - 105px);width:auto;height:auto;object-fit:contain;user-select:none;pointer-events:none}
+.live-crop-overlay .crop-stage{overflow:hidden}
+.live-crop-overlay .crop-selection{border-color:#76f1cf;background:#3aebc126;box-shadow:0 0 0 9999px #02182274}
+.live-crop-overlay .crop-help{font:600 10px/1.5 system-ui;color:#baf6e8}
 </style>
 </head>
 <body>
@@ -621,37 +627,76 @@ function bootMini(win,root){
  async function screenshot(){try{setStatus(sharedScreen?'Capturing shared screen…':'Choose a screen once, then capture instantly afterward…');const source=await captureFrame();const scale=Math.min(1,1500/Math.max(source.width,source.height));const can=doc.createElement('canvas');can.width=Math.round(source.width*scale);can.height=Math.round(source.height*scale);can.getContext('2d').drawImage(source,0,0,can.width,can.height);attached(can.toDataURL('image/jpeg',.85));setStatus('Screen attached')}catch(e){setStatus(e?.message||'Capture canceled or blocked')}}
  q('screenshot').onclick=screenshot;
  async function boxCapture(){
+   if(q('boxCapture').disabled)return;
    try{
-     setStatus(sharedScreen?'Drag a box around your question…':'Choose a screen once, then drag a box…');
-     const source=await captureFrame();
-     const overlay=doc.createElement('div');overlay.className='crop-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-label','Box Capture');
-     overlay.innerHTML='<div class="crop-title"><b>▣ Box Capture</b><span class="crop-help">Drag over the question • Esc to cancel</span></div><div class="crop-stage"><div class="crop-surface"><img draggable="false" alt="Screen capture preview"><div class="crop-selection"></div></div></div><div class="crop-buttons"><button type="button" class="crop-use" disabled>Use selected box</button><button type="button" class="crop-all">Use full image</button><button type="button" class="crop-cancel">Cancel</button></div>';
-     // Attach overlay to body, including when the main application is embedded as a fallback.
+     setStatus(sharedScreen?'Drag over the live screen to capture and ASK immediately…':'Choose a screen once, then drag directly over its live view…');
+     // Chrome mandates a user-approved source; the previously approved stream is reused.
+     await startScreenShare();
+     const overlay=doc.createElement('div');
+     overlay.className='crop-overlay live-crop-overlay';
+     overlay.setAttribute('role','dialog');
+     overlay.setAttribute('aria-modal','true');
+     overlay.setAttribute('aria-label','Live Box Capture');
+     overlay.innerHTML='<div class="crop-title"><b>▣ Live Box Capture</b><span class="crop-help">Drag around a question to ASK immediately • Esc cancels</span></div><div class="crop-stage"><div class="crop-surface"><video class="crop-live" autoplay muted playsinline></video><div class="crop-selection"></div></div></div><div class="crop-buttons"><span class="crop-help">Live view of your approved screen · No second screenshot-selection step</span><button type="button" class="crop-cancel">Cancel</button></div>';
      doc.body.appendChild(overlay);
-     const img=overlay.querySelector('img'),surface=overlay.querySelector('.crop-surface'),sel=overlay.querySelector('.crop-selection'),use=overlay.querySelector('.crop-use');
-     const preview=source.toDataURL('image/jpeg',.88);img.src=preview;
-     let start=null,box=null,active=false;
+     const video=overlay.querySelector('video'),surface=overlay.querySelector('.crop-surface'),sel=overlay.querySelector('.crop-selection');
+     video.srcObject=sharedScreen;
+     video.muted=true;
+     video.playsInline=true;
+     video.autoplay=true;
+     let active=false,startPoint=null,complete=false;
      const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
-     const pos=e=>{const r=img.getBoundingClientRect();return {x:clamp(e.clientX-r.left,0,r.width),y:clamp(e.clientY-r.top,0,r.height),w:r.width,h:r.height}};
-     function draw(){if(!box)return;sel.style.display='block';sel.style.left=box.x+'px';sel.style.top=box.y+'px';sel.style.width=box.w+'px';sel.style.height=box.h+'px';use.disabled=box.w<5||box.h<5}
-     function cleanup(){doc.removeEventListener('keydown',onKey,true);overlay.remove()}
-     function onKey(e){if(e.key==='Escape'){e.preventDefault();cleanup();setStatus('Box Capture canceled')}}
+     const position=e=>{const r=video.getBoundingClientRect();return {x:clamp(e.clientX-r.left,0,r.width),y:clamp(e.clientY-r.top,0,r.height),width:r.width,height:r.height}};
+     function clean(){
+       doc.removeEventListener('keydown',onKey,true);
+       try{video.pause();video.srcObject=null;}catch(e){}
+       overlay.remove();
+     }
+     function onKey(e){if(e.key==='Escape'){e.preventDefault();e.stopPropagation();clean();setStatus('Box Capture cancelled');}}
      doc.addEventListener('keydown',onKey,true);
-     surface.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();start=pos(e);active=true;box=null;sel.style.display='none';use.disabled=true;surface.setPointerCapture(e.pointerId)});
-     surface.addEventListener('pointermove',e=>{if(!active||!start)return;const v=pos(e);box={x:Math.min(start.x,v.x),y:Math.min(start.y,v.y),w:Math.abs(v.x-start.x),h:Math.abs(v.y-start.y)};draw()});
-     surface.addEventListener('pointerup',e=>{if(!active)return;active=false;const v=pos(e);box={x:Math.min(start.x,v.x),y:Math.min(start.y,v.y),w:Math.abs(v.x-start.x),h:Math.abs(v.y-start.y)};draw();try{surface.releasePointerCapture(e.pointerId)}catch(_){}});
-     use.onclick=()=>{
-       if(!box||box.w<5||box.h<5)return;
-       const rect=img.getBoundingClientRect(),sx=source.width/rect.width,sy=source.height/rect.height;
-       const x=Math.max(0,Math.floor(box.x*sx)),y=Math.max(0,Math.floor(box.y*sy));
-       const w=Math.min(source.width-x,Math.max(1,Math.ceil(box.w*sx))),h=Math.min(source.height-y,Math.max(1,Math.ceil(box.h*sy)));
-       const scaled=Math.min(1,1800/Math.max(w,h));const cropped=doc.createElement('canvas');cropped.width=Math.max(1,Math.round(w*scaled));cropped.height=Math.max(1,Math.round(h*scaled));
-       cropped.getContext('2d').drawImage(source,x,y,w,h,0,0,cropped.width,cropped.height);
-       attached(cropped.toDataURL('image/jpeg',.88));cleanup();setStatus('Selected question attached');
-     };
-     overlay.querySelector('.crop-all').onclick=()=>{const f=Math.min(1,1800/Math.max(source.width,source.height));const can=doc.createElement('canvas');can.width=Math.round(source.width*f);can.height=Math.round(source.height*f);can.getContext('2d').drawImage(source,0,0,can.width,can.height);attached(can.toDataURL('image/jpeg',.84));cleanup();setStatus('Full screen attached')};
-     overlay.querySelector('.crop-cancel').onclick=()=>{cleanup();setStatus('Box Capture canceled')};
-   }catch(e){setStatus(e?.message||'Box Capture canceled or blocked')}
+     overlay.querySelector('.crop-cancel').onclick=()=>{clean();setStatus('Box Capture cancelled');};
+     try{await video.play();}catch(e){clean();throw Error('Unable to show the live screen preview: '+(e?.message||'unknown error'));}
+     surface.addEventListener('pointerdown',e=>{
+       if(e.button!==0||complete)return;
+       e.preventDefault();active=true;startPoint=position(e);
+       sel.style.display='block';sel.style.left=startPoint.x+'px';sel.style.top=startPoint.y+'px';sel.style.width='0px';sel.style.height='0px';
+       try{surface.setPointerCapture(e.pointerId);}catch(err){}
+     });
+     surface.addEventListener('pointermove',e=>{
+       if(!active||!startPoint)return;
+       const v=position(e);
+       sel.style.left=Math.min(startPoint.x,v.x)+'px';
+       sel.style.top=Math.min(startPoint.y,v.y)+'px';
+       sel.style.width=Math.abs(startPoint.x-v.x)+'px';
+       sel.style.height=Math.abs(startPoint.y-v.y)+'px';
+     });
+     surface.addEventListener('pointerup',async e=>{
+       if(!active||!startPoint||complete)return;
+       active=false;
+       try{surface.releasePointerCapture(e.pointerId);}catch(err){}
+       const v=position(e);
+       const box={x:Math.min(startPoint.x,v.x),y:Math.min(startPoint.y,v.y),w:Math.abs(startPoint.x-v.x),h:Math.abs(startPoint.y-v.y)};
+       if(box.w<8||box.h<8){sel.style.display='none';setStatus('Selection too small. Drag a larger rectangle.');return;}
+       complete=true;
+       try{
+         // Capture the CURRENT frame from the already-consented live stream at pointer release.
+         const source=await captureFrame();
+         const sx=source.width/v.width,sy=source.height/v.height;
+         const x=clamp(Math.floor(box.x*sx),0,source.width-1),y=clamp(Math.floor(box.y*sy),0,source.height-1);
+         const w=clamp(Math.ceil(box.w*sx),1,source.width-x),h=clamp(Math.ceil(box.h*sy),1,source.height-y);
+         const scale=Math.min(1,1750/Math.max(w,h));
+         const crop=doc.createElement('canvas');
+         crop.width=Math.max(1,Math.round(w*scale));crop.height=Math.max(1,Math.round(h*scale));
+         crop.getContext('2d',{alpha:false}).drawImage(source,x,y,w,h,0,0,crop.width,crop.height);
+         // The selection automatically attaches AND sends using whichever image-capable AI is active.
+         attached(crop.toDataURL('image/jpeg',.87));
+         if(!q('prompt').value.trim())q('prompt').value='Read the selected question and give a clear, accurate answer.';
+         clean();
+         setStatus('Sending selected area to '+q('engine').selectedOptions[0].textContent+'…');
+         await send();
+       }catch(error){clean();setStatus('Box Capture failed: '+(error?.message||'unknown error'));}
+     });
+   }catch(error){setStatus(error?.message||'Box Capture cancelled or blocked');}
  }
  q('boxCapture').onclick=boxCapture;
  q('clear').onclick=()=>{history=[];q('chat').innerHTML='<div class="empty" id="empty"><div class="art">⚓</div><b>Fresh parchment.</b><p>Ready for another question.</p></div>';clearAttached()};
