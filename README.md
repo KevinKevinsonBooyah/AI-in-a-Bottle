@@ -18,10 +18,10 @@ GitHub will publish `index.html` at the URL above.
 ## Window controls
 
 - Resize the popup from its window edges: the header, tabs, chat, and controls reflow for narrow or short windows.
-- Right-click anywhere **inside the app** (home page or mini-window) to conceal the mini-window contents; right-click again to restore them. The underlying browser popup frame may remain visible, because browser JavaScript cannot minimize an operating-system window.
+- Right-click inside the mini-window to close it; right-click inside the original AI in a Bottle tab to reopen it at the last selected size and restore the current draft.
 - When **Stealth Mode** is checked, three quick left-clicks anywhere inside the app (including the parent page and mini-window) close the mini-window and navigate the parent tab to Google Classroom.
 - These gestures work only while interacting with the AI in a Bottle webpages. They cannot intercept mouse events in unrelated tabs, browsers, or desktop apps.
-- Right-click is reserved for this shortcut, so use Ctrl+V or keyboard shortcuts to paste into the app.
+- The right-click menu inside AI in a Bottle is reserved for the hide/reopen shortcut; this does not affect right-clicks in other Chrome tabs.
 
 ## Gemini setup
 
@@ -52,7 +52,7 @@ For GitHub Pages, Ollama might block browser-origin requests. If needed, set `OL
 ## Ghost Mode and capture update (November 2026)
 
 - **Stealth mini-window:** dark ocean-night theme, animated radar scan and a small “Ghost Mode” indicator. The tab favicon/title switch to Classroom when Stealth Mode is active; this is only a visual tab disguise, not Google Classroom itself.
-- **Close/reopen:** right-click *inside* the mini-window to close it completely. Press Alt inside the original AI in a Bottle web page, or focus that page and press **Alt**, to reopen it with your current draft. Web pages cannot detect right-clicks on Chrome's tab strip, browser chrome, other tabs or other apps.
+- **Close/reopen:** right-click *inside* the mini-window to close it completely. Right-click inside the original AI in a Bottle web page to reopen it with your current draft. Web pages cannot detect right-clicks on Chrome's tab strip, other tabs, or other apps.
 - **Box Capture:** on the first use per open mini-window, select a screen or tab in Chrome's permission chooser. The app keeps the approved capture stream for follow-up screenshots, so later Box Capture/Screen presses don't open the chooser again. **Stop Sharing** stops the stream; closing the mini-window stops it too. Chrome's first-time picker is mandatory and cannot be bypassed by HTML. Reusing a stream does not provide permission for other screens.
 - **Ollama setup:** **Settings → Ollama** includes numbered instructions and official links for installation, model download (`ollama pull qwen3-vl:4b-instruct`), service testing, and allowing the website origin. **Repair Ollama** diagnoses first; the optional Windows script download is a separate, explicit click. Only run that script on your own computer with permission to install software.
 
@@ -99,11 +99,11 @@ Free local inference means no per-message credits; it does not guarantee interne
 
 ## November 3 update: SuperTiny, Browser Vision, quick models, CodeHS-style JavaScript
 
-### Window and keyboard controls
+### Window and stealth controls
 
 - Launch **SuperTiny Mode** from the home page, requesting a **240 × 310** popup. Chrome/Chromebook window-manager minimums may enforce larger dimensions; small-screen CSS adapts the app to available space.
-- Press **Alt** by itself in the main website or mini-window to close/reopen it. Chrome or your operating system may intercept Alt for menu shortcuts, and the shortcut never works in unrelated tabs/programs. Right-click is no longer hijacked; the normal browser context menu works.
-- While **Stealth Mode** is on, press **Space** (outside text inputs, drop-downs, or code editors) for the panic action. It closes the popup and redirects the parent page to Google Classroom. Space continues typing normally inside editable fields. The old triple-click shortcut has been removed.
+- **Right-click:** closes the mini-window, or reopens it from the original website tab. The previous Alt hide shortcut is removed.
+- **Triple-click panic:** with Stealth Mode enabled, three quick left-clicks within 850 ms in either AI page or popup close the popup and redirect the original tab to Google Classroom. The previous Space panic shortcut is removed.
 
 ### Two downloadable AI modes
 
