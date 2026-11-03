@@ -100,7 +100,9 @@ function graphicsBoot(userCode, token){
  };
  requestAnimationFrame(render);
  try{
-  new Function(userCode+'\nif(typeof start === "function")start();')();
+  const symbols=['Rectangle','Circle','Oval','Line','Text','Color','Randomizer','add','remove','removeAll','getWidth','getHeight','getElementAt','mouseClickMethod','mouseMoveMethod','keyDownMethod','setTimer','stopTimer','println','print','readBoolean','readInt','readFloat','readLine'];
+  const args=symbols.map(key=>window[key]);
+  new Function(...symbols,userCode+'\nif(typeof start === "function")start();')(...args);
   notify('line','✓ Graphics started. Click the canvas or use the keyboard to interact.');
  }catch(error){notify('error',error.stack||error.message||String(error));}
 }
