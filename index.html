@@ -244,6 +244,28 @@ html,body{min-width:0;min-height:0}
 .local-guide .guide-command{display:block;padding:7px;margin-top:6px}
 .local-guide .guide-command button{margin-top:5px;border:1px solid #a28b60;background:#efe0bc;border-radius:5px;padding:5px 8px;font:750 10px system-ui;color:#28555a;cursor:pointer}
 .share-stop{border-color:#cc7959!important;color:#b84731!important;background:#ffeadb!important}
+
+/* Free Browser AI: compatibility, model selection, and first-download progress. */
+.browser-ai-panel{margin:11px 0 0;padding:12px;border:1px solid #90b9a6;border-radius:11px;background:linear-gradient(140deg,#e3f0e7,#fff5dd 74%);box-shadow:inset 0 1px #fff9}
+.browser-ai-heading{display:flex;align-items:center;gap:10px;margin-bottom:7px;color:#205b54}
+.browser-ai-heading strong{display:block;font:700 18px Georgia,serif}
+.browser-ai-heading small{display:block;font:650 10px/1.5 system-ui;color:#648176}
+.browser-ai-spark{display:grid;place-items:center;flex:none;width:37px;height:37px;border-radius:12px;color:#fff2bc;background:linear-gradient(145deg,#357e75,#164850);box-shadow:0 0 0 3px #95cbb04a,0 4px 11px #1b5d5134;font-size:21px}
+.browser-ai-steps{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0}
+.browser-ai-steps span{background:#def0e1;border:1px solid #a6c9b1;border-radius:30px;padding:5px 7px;color:#2b645d;font:700 9px/1.4 system-ui}
+.card .browser-ai-check,.card .browser-ai-download{width:100%;margin:4px 0 8px;min-height:36px}
+.card .browser-ai-download{background:#165b55;box-shadow:0 3px 0 #103e3a;font-size:12px}
+.card .browser-ai-download:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+.browser-ai-result{white-space:pre-wrap;background:#faf4e3;border:1px solid #c0bc95;border-left:4px solid #367f73;border-radius:6px;padding:9px;margin:5px 0 10px;font:11px/1.55 system-ui;color:#355f57;overflow-wrap:anywhere}
+.browser-ai-progress{padding:10px 8px;margin:6px 0 10px;background:#d5e8dd;border-radius:7px;border:1px solid #9abfb0}
+.browser-ai-progress-head{display:flex;gap:8px;justify-content:space-between;font:650 10px system-ui;color:#22564e;margin-bottom:7px}
+.browser-ai-track{background:#96b2ac;border-radius:15px;height:10px;overflow:hidden}
+#browserProgressFill{background:linear-gradient(90deg,#1a6561,#48af90,#d8da87);border-radius:15px;height:100%;width:0%;transition:width .2s ease}
+.minibody.is-stealth .browser-ai-panel{background:linear-gradient(135deg,#0d3441,#124c50);border-color:#32968d}
+.minibody.is-stealth .browser-ai-heading,.minibody.is-stealth .browser-ai-heading small,.minibody.is-stealth .browser-ai-result{color:#cbf6e9}
+.minibody.is-stealth .browser-ai-steps span,.minibody.is-stealth .browser-ai-result,.minibody.is-stealth .browser-ai-progress{background:#163c48;border-color:#2f807e;color:#c5eee5}
+.minibody.is-stealth .browser-ai-progress-head{color:#d4fae7}
+@media(prefers-reduced-motion:reduce){#browserProgressFill{transition:none}}
 </style>
 </head>
 <body>
@@ -271,7 +293,7 @@ REPEAT 4 TIMES
  x ← x + 2
 }
 DISPLAY(x)</textarea><button id="traceBtn" class="cta">Trace program</button><div class="result" id="traceResult" style="margin-top:10px">Results will appear here.</div></div></div></section>
-<section class="view" id="v-settings"><div class="panel"><h3>Settings</h3><p class="lead">Choose your AI and adjust the limits.</p><div class="card conf-card"><h4>⚓ Move your settings</h4><p class="hint">Export or import AI choices and request limits. Your Gemini API key is <strong>never</strong> included.</p><div class="row2"><button type="button" class="cta" id="exportConfig">⬇ Export Config</button><button type="button" class="quick" id="importConfig">⬆ Import Config</button></div><input type="file" id="configFile" accept=".json,application/json" hidden><p id="configStatus" class="hint" role="status"></p></div><div class="card"><h4>AI engine</h4><label for="engine">How to answer</label><select id="engine"><option value="offline">Offline • basic tools only</option><option value="gemini">Gemini • online AI</option><option value="ollama">Ollama • local AI (PC only)</option></select><div id="onlineConfig" style="display:none"><label for="key">Google AI Studio API key</label><input id="key" type="password" autocomplete="off" placeholder="Paste your Gemini API key">
+<section class="view" id="v-settings"><div class="panel"><h3>Settings</h3><p class="lead">Choose your AI and adjust the limits.</p><div class="card conf-card"><h4>⚓ Move your settings</h4><p class="hint">Export or import AI choices and request limits. Your Gemini API key is <strong>never</strong> included.</p><div class="row2"><button type="button" class="cta" id="exportConfig">⬇ Export Config</button><button type="button" class="quick" id="importConfig">⬆ Import Config</button></div><input type="file" id="configFile" accept=".json,application/json" hidden><p id="configStatus" class="hint" role="status"></p></div><div class="card"><h4>AI engine</h4><label for="engine">How to answer</label><select id="engine"><option value="offline">Offline • basic tools only</option><option value="browser">Free Browser AI • no key, unlimited</option><option value="gemini">Gemini • online AI</option><option value="ollama">Ollama • local AI (PC only)</option></select><div id="onlineConfig" style="display:none"><label for="key">Google AI Studio API key</label><input id="key" type="password" autocomplete="off" placeholder="Paste your Gemini API key">
 <p id="keyStatus" class="hint" role="status">Key stays in this open window only; it is never saved or exported.</p>
 <label for="model">Model quality</label>
 <select id="model"><option value="smart">Auto • picks the best free model</option><option value="fast">Quick • smaller model first</option><option value="balanced">Balanced • standard model first</option><option value="deep">Deep • stronger model when available</option></select>
@@ -291,7 +313,26 @@ DISPLAY(x)</textarea><button id="traceBtn" class="cta">Trace program</button><di
   <div class="quota-all" id="quotaAll" aria-live="polite"></div>
   <p class="hint">Find your real per-model RPD limits at <a href="https://aistudio.google.com/rate-limit" target="_blank" rel="noreferrer">AI Studio → Rate limits</a> and enter suitably conservative numbers here. Counters don't include requests from other apps or devices, and may reset if browser storage is cleared.</p>
   <p class="hint" id="routeStats" aria-live="polite">No successful online requests yet.</p>
-</div></details><p class="hint">For your security, API keys are never saved in browser storage or config exports. Paste yours each new session. Avoid sharing it with anyone.</p></div><div id="ollamaConfig" style="display:none" class="local-config">
+</div></details><p class="hint">For your security, API keys are never saved in browser storage or config exports. Paste yours each new session. Avoid sharing it with anyone.</p></div><div id="browserAIConfig" class="browser-ai-panel" style="display:none">
+  <div class="browser-ai-heading"><span class="browser-ai-spark">✦</span><div><strong>Free Browser AI</strong><small>Runs on your device • no API key • no message credits</small></div></div>
+  <p class="hint">Download an AI model into Chrome's cache and ask text questions without Ollama. The model runs using <b>WebGPU</b>, not just your CPU. The first download can be large, and school settings may block it.</p>
+  <label for="browserModel">Model size</label>
+  <select id="browserModel">
+    <option value="SmolLM2-360M-Instruct-q4f32_1-MLC">Lightweight · SmolLM2 360M (about 0.6 GB GPU memory)</option>
+    <option value="Llama-3.2-1B-Instruct-q4f32_1-MLC" selected>Balanced · Llama 3.2 1B (about 1.1 GB GPU memory)</option>
+    <option value="Llama-3.2-3B-Instruct-q4f32_1-MLC">Stronger · Llama 3.2 3B (about 3 GB GPU memory)</option>
+  </select>
+  <div class="browser-ai-steps"><span>1. Check this Chromebook</span><span>2. Download model once</span><span>3. Ask away</span></div>
+  <button type="button" id="browserCheck" class="quick browser-ai-check">✓ Check Compatibility</button>
+  <div id="browserCheckInfo" class="browser-ai-result" role="status" aria-live="polite">Click <b>Check Compatibility</b>. No AI files will download until you choose to load a model.</div>
+  <button type="button" id="browserDownload" class="cta browser-ai-download" disabled>↓ Download &amp; Start Free AI</button>
+  <div id="browserProgressArea" class="browser-ai-progress" hidden>
+     <div class="browser-ai-progress-head"><strong id="browserProgressText">Preparing…</strong><span id="browserPercent">0%</span></div>
+     <div class="browser-ai-track"><div id="browserProgressFill"></div></div>
+  </div>
+  <p id="browserReady" class="hint" role="status">Text-only for now: Free Browser AI cannot read Screen or Box Capture images. Gemini and Ollama still support screenshots.</p>
+  <p class="hint">Downloaded weights are cached by Chrome if storage is available. Clearing site data or school browser policies may remove them. This requires the internet for the first download and may require a connection to load the library on future visits. <a href="https://webllm.mlc.ai/docs/user/get_started.html" target="_blank" rel="noopener noreferrer">WebLLM information</a></p>
+</div><div id="ollamaConfig" style="display:none" class="local-config">
   <h4>⚓ Old local AI · Ollama</h4>
   <p class="hint">The original desktop version used <strong>qwen3-vl:4b-instruct</strong>. Local AI runs on your own PC, without Gemini quotas. It is not installed inside the HTML.</p><details class="local-guide" open><summary>📋 Set up Ollama on Windows — step by step</summary><div class="guide-body"><ol>
 <li class="setup-step"><b>Install Ollama (personal PC only).</b><p>Open the <a href="https://ollama.com/download/windows" target="_blank" rel="noopener noreferrer">official Windows installer</a>. Download, install, and open <b>Ollama</b> from Start. It runs in the background. For current Windows requirements see <a href="https://docs.ollama.com/windows" target="_blank" rel="noopener noreferrer">Windows documentation</a>.</p></li>
@@ -303,9 +344,9 @@ DISPLAY(x)</textarea><button id="traceBtn" class="cta">Trace program</button><di
   <label for="ollamaModel">Installed model name</label><input id="ollamaModel" type="text" value="qwen3-vl:4b-instruct" autocomplete="off" spellcheck="false">
   <div class="row2"><button type="button" id="ollamaCheck" class="quick">Test connection</button><button type="button" id="repairOllama" class="cta">🛠 Repair Ollama</button></div><button id="downloadRepair" class="cta" type="button" style="display:none;margin-top:8px">↓ Download Windows repair script</button><div id="repairInfo" class="repair-help" role="status" hidden></div>
   <p id="ollamaInfo" class="hint" role="status">Only connects to your own computer. On GitHub Pages, Ollama may need <code>OLLAMA_ORIGINS=https://kevinkevinsonbooyah.github.io</code> configured and restarted, and Chrome may request local-network access.</p>
-</div><p class="hint">The HTML includes offline tools, not a full AI model. Gemini needs internet and your API key. Ollama needs the local model installed on your computer.</p></div><div class="card"><h4>Quick help</h4><p class="hint">Use <b>Ask</b> for any topic. <b>Box Capture</b> asks you to choose a screen the first time, then reuses your approved share for later captures until you press <b>Stop Sharing</b> or close the mini-window. Right-click inside the popup to close it. To reopen, right-click inside the original page or press <b>Alt+Shift+B</b> while that page is focused. Chrome does not allow websites to detect right-clicks on its tab bar.</p><p class="hint">Gemini needs a key every new session; Ollama needs a local Windows installation. Never share your API key.</p></div></div></section>
+</div><p class="hint">Free Browser AI can download a model into Chrome and run on compatible devices. Gemini needs a key; Ollama needs a local installation. Browser AI is currently text-only.</p></div><div class="card"><h4>Quick help</h4><p class="hint">Use <b>Ask</b> for any topic. <b>Box Capture</b> asks you to choose a screen the first time, then reuses your approved share for later captures until you press <b>Stop Sharing</b> or close the mini-window. Right-click inside the popup to close it. To reopen, right-click inside the original page or press <b>Alt+Shift+B</b> while that page is focused. Chrome does not allow websites to detect right-clicks on its tab bar.</p><p class="hint">Gemini needs a key every new session; Ollama needs a local Windows installation. Never share your API key.</p></div></div></section>
 </main>
-<footer class="foot"><span>☸ Your pocket-sized AI • Free-model routing</span><span id="status">Ready to sail</span></footer>
+<footer class="foot"><span>☸ Your pocket-sized AI • Free & local choices</span><span id="status">Ready to sail</span></footer>
 </div>
 </template>
 <script>
@@ -344,7 +385,7 @@ function rememberSession(win){
  try{
   const d=win.document;
   const get=id=>d.getElementById(id)?.value||'';
-  sessionSettings={engine:get('engine'),model:get('model'),key:get('key'),host:get('ollamaHost'),localModel:get('ollamaModel'),snapshot:typeof win.__aiBottleSnapshot==='function'?win.__aiBottleSnapshot():null};
+  sessionSettings={engine:get('engine'),model:get('model'),key:get('key'),host:get('ollamaHost'),localModel:get('ollamaModel'),browserModel:get('browserModel'),snapshot:typeof win.__aiBottleSnapshot==='function'?win.__aiBottleSnapshot():null};
  }catch(e){}
 }
 function closeMini(){
@@ -422,7 +463,7 @@ function bootMini(win,root){
  const setStatus=t=>q('status').textContent=t;
   if(sessionSettings){
     try{
-      for(const [id,val] of [['engine',sessionSettings.engine],['model',sessionSettings.model],['key',sessionSettings.key],['ollamaHost',sessionSettings.host],['ollamaModel',sessionSettings.localModel]]){
+      for(const [id,val] of [['engine',sessionSettings.engine],['model',sessionSettings.model],['key',sessionSettings.key],['ollamaHost',sessionSettings.host],['ollamaModel',sessionSettings.localModel],['browserModel',sessionSettings.browserModel]]){
         if(q(id)&&val)q(id).value=val;
       }
     }catch(e){}
@@ -524,12 +565,128 @@ function bootMini(win,root){
  }
  q('boxCapture').onclick=boxCapture;
  q('clear').onclick=()=>{history=[];q('chat').innerHTML='<div class="empty" id="empty"><div class="art">⚓</div><b>Fresh parchment.</b><p>Ready for another question.</p></div>';clearAttached()};
+ // Free, text-only browser model. Nothing is downloaded until the user clicks Download.
+ const BROWSER_MODELS={
+  'SmolLM2-360M-Instruct-q4f32_1-MLC':{memory:0.6,level:'Lightweight'},
+  'Llama-3.2-1B-Instruct-q4f32_1-MLC':{memory:1.1,level:'Balanced'},
+  'Llama-3.2-3B-Instruct-q4f32_1-MLC':{memory:3.0,level:'Stronger'}
+ };
+ let browserEngine=null,browserLoadedModel='',browserLoading=null,browserLib=null;
+ let browserCompatible=false,browserCancelRequested=false;
+ function browserProgress(label,amount){
+  const area=q('browserProgressArea');area.hidden=false;
+  const progress=Math.max(0,Math.min(1,Number(amount)||0));
+  q('browserProgressText').textContent=label||'Preparing model…';
+  q('browserPercent').textContent=Math.round(progress*100)+'%';
+  q('browserProgressFill').style.width=(progress*100)+'%';
+ }
+ function displayBrowserResult(message,failed=false){
+  q('browserCheckInfo').textContent=message;
+  q('browserCheckInfo').style.borderLeftColor=failed?'#bd6255':'#348c79';
+ }
+ q('browserModel').onchange=()=>{
+   if(browserCompatible)displayBrowserResult('Model size changed. The GPU check still applies; storage needs may differ. Click Check Compatibility again for the new model.');
+   if(browserLoadedModel===q('browserModel').value){
+    q('browserReady').textContent='✓ This model is already loaded. Open Ask and type a question.';
+   }else{
+    q('browserReady').textContent='Selected model is not loaded yet. Check compatibility, then click Download & Start Free AI.';
+   }
+ };
+ async function checkBrowserCompatibility(){
+  const btn=q('browserCheck');btn.disabled=true;browserCompatible=false;q('browserDownload').disabled=true;
+  displayBrowserResult('Checking Chrome’s WebGPU and browser storage…');
+  try{
+   if(!win.isSecureContext)throw Error('Open the HTTPS GitHub Pages website. WebGPU needs a secure context.');
+   if(!win.navigator.gpu?.requestAdapter)throw Error('WebGPU is unavailable or blocked by Chrome or school policy. Check chrome://gpu in Chrome, or use Gemini.');
+   let adapter=await win.navigator.gpu.requestAdapter({powerPreference:'high-performance'});
+   if(!adapter)adapter=await win.navigator.gpu.requestAdapter();
+   if(!adapter)throw Error('Chrome could not access a compatible GPU. A fast CPU alone does not enable WebGPU.');
+   // Creating and destroying a device verifies a real usable WebGPU context.
+   let device;
+   try{device=await adapter.requestDevice();if(device.lost)device.lost.catch(()=>{});}
+   catch(e){throw Error('The GPU was detected but Chrome cannot create a usable WebGPU device: '+(e?.message||'unknown error'));}
+   finally{try{device?.destroy()}catch(e){}}
+   const storage=await win.navigator.storage?.estimate?.().catch(()=>null);
+   const available=storage&&Number.isFinite(storage.quota)&&Number.isFinite(storage.usage)?Math.max(0,(storage.quota-storage.usage)/(1024**3)):null;
+   const ram=Number(win.navigator.deviceMemory)||null;
+   const selected=q('browserModel').value;
+   if(!BROWSER_MODELS[selected])throw Error('Unknown browser model selection.');
+   const info=[];
+   info.push('✓ WebGPU works in this browser.');
+   if(available!==null)info.push('Browser storage quota estimate: ~'+available.toFixed(1)+' GB remaining. This is NOT a physical free-disk-space measurement.');
+   else info.push('Chrome did not report its storage quota. You can still try the download.');
+   if(ram)info.push('Approximate device RAM reported by Chrome: '+ram+' GB.');
+   const needed={
+    'SmolLM2-360M-Instruct-q4f32_1-MLC':0.8,
+    'Llama-3.2-1B-Instruct-q4f32_1-MLC':1.3,
+    'Llama-3.2-3B-Instruct-q4f32_1-MLC':3.2
+   }[selected];
+   if(available!==null&&available<needed+0.4)info.push('⚠ Storage quota may be too small for this model. Try Lightweight or free space.');
+   if(ram&&ram<=4&&selected!=='SmolLM2-360M-Instruct-q4f32_1-MLC')info.push('⚠ This device may struggle with the selected model. Lightweight is safer.');
+   info.push('✓ You can try the download. The model will only download if you click the button below.');
+   browserCompatible=true;q('browserDownload').disabled=false;
+   displayBrowserResult(info.join('\n'));
+   q('browserReady').textContent='Compatible GPU detected. Choose Download & Start Free AI when ready.';
+  }catch(e){displayBrowserResult('✕ '+(e?.message||'WebGPU check failed'),true);q('browserReady').textContent='Browser AI is unavailable here. Gemini and Ollama remain available.';}
+  finally{btn.disabled=false;}
+ }
+ q('browserCheck').onclick=checkBrowserCompatibility;
+ async function loadBrowserModel(){
+  const chosen=q('browserModel').value;
+  if(!BROWSER_MODELS[chosen])throw Error('Select a supported browser model.');
+  if(!browserCompatible)throw Error('First open Settings → Free Browser AI and click Check Compatibility.');
+  if(browserEngine&&browserLoadedModel===chosen)return browserEngine;
+  if(browserLoading)return browserLoading;
+  const btn=q('browserDownload');btn.disabled=true;
+  const promise=(async()=>{
+   browserProgress('Connecting to the WebLLM library…',0);
+   if(!browserLib){
+    try{browserLib=await import('https://esm.run/@mlc-ai/web-llm@0.2.87');}
+    catch(e){throw Error('Chrome could not download the WebLLM library. School filtering may block esm.run. '+(e?.message||''));}
+   }
+   const available=browserLib.prebuiltAppConfig?.model_list?.some(x=>x.model_id===chosen);
+   if(!available)throw Error('The selected model is not included in this WebLLM version. Try another size.');
+   // Unload the previous model before allocating GPU memory for a different one.
+   if(browserEngine){try{await browserEngine.unload()}catch(e){}browserEngine=null;browserLoadedModel='';}
+   const engine=await browserLib.CreateMLCEngine(chosen,{
+     initProgressCallback:(progress)=>{
+      const text=String(progress?.text||'Loading the AI model…');
+      browserProgress(text.slice(0,135),progress?.progress);
+      setStatus('Loading Free Browser AI · '+Math.round(Math.max(0,Math.min(1,Number(progress?.progress)||0))*100)+'%');
+     }
+   });
+   browserEngine=engine;browserLoadedModel=chosen;
+   browserProgress('✓ Model ready in this browser',1);
+   q('browserReady').textContent='✓ '+BROWSER_MODELS[chosen].level+' is ready. Open Ask, type a question, and press ASK. No API key or daily credits.';
+   setStatus('Free Browser AI ready');
+   return engine;
+  })();
+  browserLoading=promise;
+  try{return await promise}
+  catch(e){q('browserReady').textContent='Could not load AI: '+(e?.message||'Unknown error')+' Try Lightweight or check school network restrictions.';setStatus('Browser AI failed to load');throw e;}
+  finally{browserLoading=null;btn.disabled=!browserCompatible;}
+ }
+ q('browserDownload').onclick=()=>loadBrowserModel().catch(()=>{});
+ async function browserAnswer(txt,img){
+  if(img)throw Error('Free Browser AI currently handles text only. Remove the screenshot, or use Gemini / Ollama to read images.');
+  if(!browserEngine||browserLoadedModel!==q('browserModel').value)throw Error('The model is not loaded. Go to Settings → Free Browser AI → Check Compatibility → Download & Start Free AI.');
+  browserCancelRequested=false;
+  setStatus('Free Browser AI is answering locally…');
+  const messages=[{role:'system',content:'You are AI in a Bottle. Answer accurately and clearly. Check calculations, acknowledge uncertainty, and explain solutions when helpful. Do not invent missing information.'},...history.slice(-6).map(x=>({role:x.role==='model'?'assistant':'user',content:x.text})),{role:'user',content:txt}];
+  const result=await browserEngine.chat.completions.create({messages,temperature:0.25,max_tokens:700});
+  if(browserCancelRequested)throw new DOMException('Canceled','AbortError');
+  const answer=String(result?.choices?.[0]?.message?.content||'').trim();
+  if(!answer)throw Error('The local model returned no text. Try another question or reload the model.');
+  history.push({role:'user',text:txt},{role:'model',text:answer});
+  lastRouteLabel='Browser AI · '+BROWSER_MODELS[browserLoadedModel].level;
+  return answer;
+ }
  q('engine').onchange=()=>{
- const mode=q('engine').value,online=mode==='gemini',local=mode==='ollama';
- q('onlineConfig').style.display=online?'block':'none';q('ollamaConfig').style.display=local?'block':'none';
- q('net').classList.toggle('online',online||local);
- q('netLabel').textContent=local?'Local AI':online?'Gemini AI':'Offline';
- setStatus(local?'Ollama must be running on this PC':online?'Gemini online ready':'Offline tools ready');
+ const mode=q('engine').value,online=mode==='gemini',local=mode==='ollama',browser=mode==='browser';
+ q('onlineConfig').style.display=online?'block':'none';q('ollamaConfig').style.display=local?'block':'none';q('browserAIConfig').style.display=browser?'block':'none';q('quotaCompact').style.display=online?'block':'none';
+ q('net').classList.toggle('online',online||local||browser);
+ q('netLabel').textContent=browser?'Browser AI':local?'Local AI':online?'Gemini AI':'Offline';
+ setStatus(browser?(browserEngine&&browserLoadedModel===q('browserModel').value?'Free Browser AI ready':'Free Browser AI: check compatibility'):local?'Ollama must be running on this PC':online?'Gemini online ready':'Offline tools ready');
 };
  try{const settings=JSON.parse(win.localStorage.getItem('ai-bottle:ollama-settings')||'null');if(settings){if(settings.host)q('ollamaHost').value=settings.host;if(settings.model)q('ollamaModel').value=settings.model}}catch(e){}
  ['ollamaHost','ollamaModel'].forEach(id=>q(id).addEventListener('change',()=>{try{win.localStorage.setItem('ai-bottle:ollama-settings',JSON.stringify({host:q('ollamaHost').value,model:q('ollamaModel').value}))}catch(e){}}));
@@ -664,7 +821,7 @@ exit /b 1
   try{win.localStorage.removeItem('ai-bottle:gemini-key:v1')}catch(e){}
   q('keyStatus').textContent='Key is temporary and excluded from exported settings.';
 
- q('cancel').onclick=()=>{requestCtrl?.abort();requestCtrl=null;setStatus('Canceled')};
+ q('cancel').onclick=()=>{requestCtrl?.abort();requestCtrl=null;browserCancelRequested=true;try{browserEngine?.interruptGenerate?.()}catch(e){}setStatus('Canceled')};
  q('prompt').onkeydown=e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();send()}};
  q('send').onclick=send;
  function simpleAnswer(question){
@@ -742,7 +899,7 @@ exit /b 1
   }
   q('exportConfig').onclick=()=>{
     const config={app:'AI in a Bottle',formatVersion:2,engine:q('engine').value,modelMode:q('model').value,
-      dailyBudgets:{lite:meterState.caps.lite,flash:meterState.caps.flash,pro:meterState.caps.pro},
+      browserModel:q('browserModel').value,dailyBudgets:{lite:meterState.caps.lite,flash:meterState.caps.flash,pro:meterState.caps.pro},
       ollama:{host:q('ollamaHost').value.trim(),model:q('ollamaModel').value.trim()}};
     downloadJson(config);
     q('configStatus').textContent='Downloaded your settings. No API key was saved.';
@@ -754,9 +911,10 @@ exit /b 1
       if(f.size>64000)throw Error('Config file is too large.');
       const config=JSON.parse(await f.text());
       if(!config||config.app!=='AI in a Bottle'||config.formatVersion!==2)throw Error('Not an AI in a Bottle config file.');
-      const engines=['offline','gemini','ollama'],modes=['smart','fast','balanced','deep'];
+      const engines=['offline','browser','gemini','ollama'],modes=['smart','fast','balanced','deep'];
       if(engines.includes(config.engine))q('engine').value=config.engine;
       if(modes.includes(config.modelMode))q('model').value=config.modelMode;
+      if(typeof config.browserModel==='string'&&Object.hasOwn(BROWSER_MODELS,config.browserModel))q('browserModel').value=config.browserModel;
       if(config.dailyBudgets && typeof config.dailyBudgets==='object')for(const g of Object.keys(DAILY_DEFAULTS)){
         const n=Number(config.dailyBudgets[g]);if(Number.isSafeInteger(n)&&n>=1&&n<=10000)meterState.caps[g]=n;
       }
@@ -838,8 +996,7 @@ exit /b 1
        // Smaller questions get shorter answers. Complex AP code is allowed more reasoning.
        const maxTokens=route.level==='easy'?3072:(route.level==='moderate'?8192:16384);
        recordAttempt(model);
-       const res=await win.fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent',{
-         method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},
+       const res=await win.fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent',{         method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},
          body:JSON.stringify({system_instruction:{parts:[{text:SYSTEM}]},contents:content,generationConfig:{temperature:0.2,maxOutputTokens:maxTokens}}),
          signal:requestCtrl.signal
        });
@@ -877,7 +1034,7 @@ exit /b 1
    if(!attempted)throw Error('All models are cooling down or have reached this app daily allowance. Adjust your personal limits in Config if your AI Studio quota allows it, or wait for the reset.');
    throw Error('No free-tier model is available right now. '+errors.slice(0,3).join(' | '));
  }
- async function send(){const txt=q('prompt').value.trim(),img=imageData;if(!txt&&!img)return;if(q('send').disabled)return;lastRouteLabel='';q('send').disabled=true;q('cancel').style.display='inline-block';addMsg('user',txt||'[Screenshot question]',img);q('prompt').value='';clearAttached();setStatus('Thinking…');const wait=addMsg('assistant','Working on it…');wait.classList.add('loading');try{let ans,local=simpleAnswer(txt);if(q('engine').value==='ollama'){ans=await ollamaAnswer(txt,img)}else if(q('engine').value==='offline'){if(img){ans='This offline HTML cannot read screenshots. Open Config → Online Gemini, add an API key, then send the screenshot again.'}else{ans=local?local.text:'I can solve common AP CSP questions offline (binary, overflow, logic, networking, pseudocode basics), but I cannot reliably reason through this particular question without a connected AI model.\n\nTry the Study tab for drills, or enable Online Gemini in Config.'}}else if(local&&local.type==='exact'&&!img){ans=local.text+'\n\n✓ Verified by the offline calculator.'}else{ans=await onlineAnswer(txt,img)}wait.textContent=ans;if(lastRouteLabel&&(q('engine').value==='ollama'||(q('engine').value==='gemini'&&!(local&&local.type==='exact'&&!img)))){wait.parentNode?.querySelector('.tag')?.append(' · '+lastRouteLabel);setStatus('Answered by '+lastRouteLabel)}else{setStatus('Answer ready • no API request')}lastRouteLabel=''}catch(e){wait.textContent='Could not complete the request: '+(e.name==='AbortError'?'Canceled.':e.message)+'\n\nCheck internet access, key, and model availability. Offline tools still work.';setStatus('Connection issue')}finally{wait.classList.remove('loading');q('send').disabled=false;q('cancel').style.display='none';requestCtrl=null;q('chat').scrollTop=q('chat').scrollHeight}}
+ async function send(){const txt=q('prompt').value.trim(),img=imageData;if(!txt&&!img)return;if(q('send').disabled)return;lastRouteLabel='';q('send').disabled=true;q('cancel').style.display='inline-block';addMsg('user',txt||'[Screenshot question]',img);q('prompt').value='';clearAttached();setStatus('Thinking…');const wait=addMsg('assistant','Working on it…');wait.classList.add('loading');try{let ans,local=simpleAnswer(txt);if(q('engine').value==='browser'){ans=await browserAnswer(txt,img)}else if(q('engine').value==='ollama'){ans=await ollamaAnswer(txt,img)}else if(q('engine').value==='offline'){if(img){ans='This offline HTML cannot read screenshots. Open Config → Online Gemini, add an API key, then send the screenshot again.'}else{ans=local?local.text:'I can solve common AP CSP questions offline (binary, overflow, logic, networking, pseudocode basics), but I cannot reliably reason through this particular question without a connected AI model.\n\nTry the Study tab for drills, or enable Online Gemini in Config.'}}else if(local&&local.type==='exact'&&!img){ans=local.text+'\n\n✓ Verified by the offline calculator.'}else{ans=await onlineAnswer(txt,img)}wait.textContent=ans;if(lastRouteLabel&&(q('engine').value==='browser'||q('engine').value==='ollama'||(q('engine').value==='gemini'&&!(local&&local.type==='exact'&&!img)))){wait.parentNode?.querySelector('.tag')?.append(' · '+lastRouteLabel);setStatus('Answered by '+lastRouteLabel)}else{setStatus('Answer ready • no API request')}lastRouteLabel=''}catch(e){wait.textContent='Could not complete the request: '+(e.name==='AbortError'?'Canceled.':e.message)+'\n\nCheck your selected AI and settings. For Free Browser AI, run Check Compatibility and Download & Start Free AI. Offline tools still work.';setStatus('Connection issue')}finally{wait.classList.remove('loading');q('send').disabled=false;q('cancel').style.display='none';requestCtrl=null;q('chat').scrollTop=q('chat').scrollHeight}}
  // study questions
  const quiz=[
  ['Math','What is 15% of 240?',['24','36','48','60'],1,'0.15 × 240 = 36.'],
