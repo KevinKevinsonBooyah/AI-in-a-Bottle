@@ -507,19 +507,27 @@ function bindShortcuts(win){
  const doc=win.document;
  if(doc.__aiBottleShortcutsBound)return;
  doc.__aiBottleShortcutsBound=true;
- // Space is a stealth-only panic key, but typing in input fields must never trigger it.
- // Alt alone conceals/reopens the popup. Chrome/OS can intercept Alt (e.g. menu bars).
+ // Detect a solitary Alt press/release, not Alt+Tab, Alt+F4, browser menu shortcuts.
+ let altHeld=false,altWasCombined=false;
  doc.addEventListener('keydown',event=>{
-   if(event.repeat||event.isComposing||event.ctrlKey||event.metaKey)return;
-   const element=event.target;
-   const isEditing=element?.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/i.test(element?.tagName||'');
-   if(stealth && !isEditing && (event.code==='Space'||event.key===' ')){
-     event.preventDefault();event.stopImmediatePropagation();panic();return;
+   if(event.isComposing)return;
+   const target=event.target;
+   const editing=target?.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/i.test(target?.tagName||'');
+   if(event.key==='Alt'&&!event.repeat&&!event.ctrlKey&&!event.shiftKey&&!event.metaKey){
+     altHeld=true;altWasCombined=false;return;
    }
-   if(event.key==='Alt' && !event.shiftKey){
-     event.preventDefault();event.stopImmediatePropagation();toggleQuickHide();return;
+   if(altHeld && event.key!=='Alt')altWasCombined=true;
+   if(stealth&&!editing&&!event.repeat&&!event.ctrlKey&&!event.altKey&&!event.metaKey&&(event.code==='Space'||event.key===' ')){
+     event.preventDefault();event.stopImmediatePropagation();panic();
    }
  },true);
+ doc.addEventListener('keyup',event=>{
+   if(event.key!=='Alt')return;
+   const solitary=altHeld&&!altWasCombined&&!event.ctrlKey&&!event.metaKey;
+   altHeld=false;altWasCombined=false;
+   if(solitary){event.preventDefault();event.stopImmediatePropagation();toggleQuickHide();}
+ },true);
+ win.addEventListener('blur',()=>{altHeld=false;altWasCombined=false;});
 }
 bindShortcuts(window);
 const LAUNCH_SIZES={normal:{w:438,h:690},small:{w:350,h:540},tiny:{w:290,h:420},supertiny:{w:240,h:310}};
