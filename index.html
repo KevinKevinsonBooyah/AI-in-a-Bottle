@@ -365,10 +365,10 @@ body.ghost-popup .crop-buttons button:hover{background:#1b7383}
 <section class="view" id="v-tools"><div class="panel"><h3>Navigator's Tools</h3><p class="lead">Run code, preview websites, and explore number tools.</p>
 <div class="card code-scanner" id="codeScanner">
  <div class="scanner-heading"><h4>⌘ Code Scanner</h4><span>Run · Inspect · Debug</span></div>
- <p class="hint">Run JavaScript in an isolated console, preview websites, or try other languages. This is a browser sandbox, not a Windows/Linux terminal.</p>
+ <p class="hint">Run JavaScript with CodeHS-style println/readBoolean, draw with JavaScript Graphics, or test other browser-friendly languages. Not an OS terminal.</p>
  <label for="scanLang">Language</label>
  <select id="scanLang" aria-label="Programming language">
-  <option value="javascript">JavaScript · Console</option>
+  <option value="javascript">JavaScript · Console</option><option value="javascript-graphics">JavaScript Graphics · Canvas</option>
   <option value="html">HTML · Live preview</option>
   <option value="css">CSS · Live preview</option>
   <option value="typescript">TypeScript · Console</option>
@@ -382,7 +382,7 @@ body.ghost-popup .crop-buttons button:hover{background:#1b7383}
  <div class="scanner-consolebar"><b>TERMINAL OUTPUT</b><button type="button" id="scanClear">Clear</button><button type="button" id="scanCopy">Copy</button></div>
  <pre id="scanOutput" class="scanner-output" aria-live="polite">Ready. Choose a language and press Run code.</pre>
  <div class="scanner-preview" id="scanPreviewWrap" hidden><b>LIVE PREVIEW</b><iframe id="scanPreview" title="Sandboxed code preview" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe></div>
- <p class="hint" id="scanHint">JavaScript runs in a separate worker with console output, async/await, and a Stop button. Network requests are disabled for this runner.</p>
+ <p class="hint" id="scanHint">JavaScript supports console.log, println and CodeHS-style readBoolean/readLine/readInt. Use JavaScript Graphics to draw shapes and animation.</p>
 </div><div class="card"><h4>Binary converter</h4><label for="binary">Enter decimal or binary</label><input id="binary" placeholder="e.g. 151 or 10010101"><div class="row2"><button class="quick" id="toBinary">Decimal → Binary</button><button class="quick" id="toDecimal">Binary → Decimal</button></div><div class="result" id="binaryResult" style="margin-top:10px">Enter a number to convert it.</div></div><div class="card"><h4>Overflow checker</h4><div class="row2"><div><label>First integer</label><input id="addA" type="number" value="14"></div><div><label>Second integer</label><input id="addB" type="number" value="15"></div><div><label>Bits</label><input id="bits" type="number" min="1" max="32" value="4"></div></div><button id="checkBits" class="cta">Check overflow</button><div class="result" id="overflowResult" style="margin-top:10px">4-bit values hold 0 through 15 (unsigned).</div></div><div class="card"><h4>Pseudocode trace</h4><p class="hint">Use AP-style assignments (←), DISPLAY, and REPEAT n TIMES { … }.</p><textarea id="traceInput" style="width:100%;height:103px;background:#fffaf0;border:1px solid #af9670;border-radius:5px;padding:8px;font:11px/1.5 monospace;color:#243c3c;resize:vertical">x ← 3
 REPEAT 4 TIMES
 {
@@ -446,6 +446,7 @@ DISPLAY(x)</textarea><button id="traceBtn" class="cta">Trace program</button><di
 <footer class="foot"><span>☸ Your pocket-sized AI • Free & local choices</span><span id="status">Ready to sail</span></footer>
 </div>
 </template>
+<script src="./graphics.js"></script>
 <script src="./scanner.js"></script>
 <script>
 'use strict';
