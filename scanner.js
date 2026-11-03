@@ -103,7 +103,14 @@ window.setupCodeScanner=function(win,root,traceCode){
           }
           self.console=capture;
           const AsyncFunction=Object.getPrototypeOf(async function(){}).constructor;
-          const answer=await new AsyncFunction('console',program)(capture);
+          const trimmed=program.trim();
+          let executor=null;
+          // A console also evaluates single expressions such as 2+2 and Math.sqrt(16).
+          if(trimmed&&!/[;\n]/.test(trimmed)&&!/^(?:const|let|var|function|class|if|for|while|try|switch|throw|return|import|export)\b/.test(trimmed)){
+            try{executor=new AsyncFunction('console','return ('+trimmed+');');}catch(e){}
+          }
+          if(!executor)executor=new AsyncFunction('console',program);
+          const answer=await executor(capture);
           if(answer!==undefined)post(id,'line','↳ '+show(answer));
         }else if(lang==='python'){
           if(!py){
