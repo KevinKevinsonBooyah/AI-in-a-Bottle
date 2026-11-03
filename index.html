@@ -99,6 +99,18 @@ html,body{min-width:0;min-height:0}
  .actions{gap:3px}.small{padding:4px}.panel{padding:7px}
 }
 @media(max-height:265px){.quota-compact{display:none}.attach{display:none}.bar{min-height:28px}.composer{padding:3px}}
+/* Crop screen-sharing preview: drag to select a rectangle; the capture stays local until submitted. */
+.crop-overlay{position:fixed;inset:0;z-index:9999;background:#0b2832f2;display:flex;flex-direction:column;padding:10px;gap:7px;color:#f9e5c2;font:12px system-ui,sans-serif}
+.crop-overlay[hidden]{display:none!important}
+.crop-title{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-shrink:0}
+.crop-title b{font:700 17px Georgia,serif}.crop-help{color:#c9d5c8;font-size:10px}
+.crop-stage{position:relative;flex:1;min-height:0;overflow:auto;border:2px solid #a98b53;border-radius:5px;background:#071821;display:flex;align-items:center;justify-content:center;touch-action:none}
+.crop-surface{position:relative;line-height:0;max-width:100%;max-height:100%;user-select:none;touch-action:none;cursor:crosshair}
+.crop-surface img{display:block;max-width:100%;max-height:calc(100dvh - 120px);width:auto;height:auto;object-fit:contain;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.crop-selection{position:absolute;pointer-events:none;border:2px solid #ffe0a1;background:#72d6d230;box-shadow:0 0 0 9999px #00151d66;display:none}
+.crop-buttons{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}.crop-buttons button{border:1px solid #ad956c;border-radius:4px;background:#f3dfb6;color:#29464b;font:700 11px system-ui;padding:8px 9px;cursor:pointer}.crop-buttons button:disabled{opacity:.45;cursor:not-allowed}
+.local-config{padding:12px;margin:12px 0;border-radius:6px;border:1px solid #997e57;background:#fff6e2}.local-config h4{margin:0 0 7px!important}.local-config code{overflow-wrap:anywhere;font-size:10px}
+@media(max-width:340px){.crop-overlay{padding:5px}.crop-title b{font-size:14px}.crop-help{font-size:9px}.crop-buttons button{padding:6px}.composer .actions .left{flex-wrap:wrap}}
 /* Browser popup cannot be OS-minimized from a web page. Conceal its contents instantly. */
 html.quick-hidden body{background:#123238}
 html.quick-hidden .minibody{opacity:0;transform:scale(.94);pointer-events:none;transition:opacity .13s ease,transform .13s ease}
@@ -123,7 +135,7 @@ html.quick-hidden body::after{content:'⚓ Hidden  •  Right-click to return';p
   <div class="quota-notice">Your daily app allowance, not Google's live account quota</div>
 </div>
 <div class="chat" id="chat"><div class="empty" id="empty"><div class="art">⚓</div><b>Ahoy, scholar.</b><p>Ask about AP Computer Science Principles,<br>paste a question, or bring aboard a screenshot.</p></div></div>
-<div class="composer"><div class="attach" id="attach"><span class="muted">Paste an image, upload one, or capture a screen.</span></div><div class="entry"><textarea id="prompt" placeholder="Ask yer question, matey…" aria-label="Your question"></textarea><button id="send" class="send">ASK ↗</button></div><div class="actions"><div class="left"><button id="screenshot" class="small">▧ Capture</button><button id="upload" class="small">＋ Image</button><button id="cancel" class="small" style="display:none">■ Stop</button><input id="file" type="file" accept="image/*" hidden></div><button id="clear" class="small">Clear log</button></div></div></section>
+<div class="composer"><div class="attach" id="attach"><span class="muted">Paste an image, upload one, or capture a screen.</span></div><div class="entry"><textarea id="prompt" placeholder="Ask yer question, matey…" aria-label="Your question"></textarea><button id="send" class="send">ASK ↗</button></div><div class="actions"><div class="left"><button id="screenshot" class="small" title="Capture the whole screen or tab">▧ Screen</button><button id="boxCapture" class="small" title="Capture then draw a box around the question">▣ Box Capture</button><button id="upload" class="small">＋ Image</button><button id="cancel" class="small" style="display:none">■ Stop</button><input id="file" type="file" accept="image/*" hidden></div><button id="clear" class="small">Clear log</button></div></div></section>
 <section class="view" id="v-study"><div class="panel"><h3>Captain's Academy</h3><p class="lead">Offline AP CSP drills. Work through the problem, then check your answer.</p><div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><h4 id="quizArea">Data • Binary</h4><span class="muted" id="quizCount">1 / 18</span></div><div class="question" id="quizQuestion"></div><div class="choices" id="quizChoices"></div><div class="result" id="quizExplain" style="display:none"></div><button class="cta" id="next" style="margin-top:10px">Next challenge →</button></div><div class="card"><h4>Course map</h4><p>Creative development • Data • Algorithms & programming • Systems & networks • Impact of computing.</p><p class="hint">These five areas match the College Board AP CSP framework.</p></div></div></section>
 <section class="view" id="v-tools"><div class="panel"><h3>Navigator's Tools</h3><p class="lead">Quick and exact offline helpers for AP CSP.</p><div class="card"><h4>Binary converter</h4><label for="binary">Enter decimal or binary</label><input id="binary" placeholder="e.g. 151 or 10010101"><div class="row2"><button class="quick" id="toBinary">Decimal → Binary</button><button class="quick" id="toDecimal">Binary → Decimal</button></div><div class="result" id="binaryResult" style="margin-top:10px">Enter a number to convert it.</div></div><div class="card"><h4>Overflow checker</h4><div class="row2"><div><label>First integer</label><input id="addA" type="number" value="14"></div><div><label>Second integer</label><input id="addB" type="number" value="15"></div><div><label>Bits</label><input id="bits" type="number" min="1" max="32" value="4"></div></div><button id="checkBits" class="cta">Check overflow</button><div class="result" id="overflowResult" style="margin-top:10px">4-bit values hold 0 through 15 (unsigned).</div></div><div class="card"><h4>Pseudocode trace</h4><p class="hint">Use AP-style assignments (←), DISPLAY, and REPEAT n TIMES { … }.</p><textarea id="traceInput" style="width:100%;height:103px;background:#fffaf0;border:1px solid #af9670;border-radius:5px;padding:8px;font:11px/1.5 monospace;color:#243c3c;resize:vertical">x ← 3
 REPEAT 4 TIMES
@@ -131,7 +143,7 @@ REPEAT 4 TIMES
  x ← x + 2
 }
 DISPLAY(x)</textarea><button id="traceBtn" class="cta">Trace program</button><div class="result" id="traceResult" style="margin-top:10px">Results will appear here.</div></div></div></section>
-<section class="view" id="v-settings"><div class="panel"><h3>Captain's Quarters</h3><p class="lead">By default, the offline reference tools work with no installation or internet.</p><div class="card"><h4>Choose the brain</h4><label for="engine">Answering mode</label><select id="engine"><option value="offline">Offline • built-in AP CSP reference</option><option value="gemini">Online • Gemini AI (your API key)</option></select><div id="onlineConfig" style="display:none"><label for="key">Google AI Studio API key</label><input id="key" type="password" autocomplete="off" placeholder="Paste your Gemini API key">
+<section class="view" id="v-settings"><div class="panel"><h3>Captain's Quarters</h3><p class="lead">By default, the offline reference tools work with no installation or internet.</p><div class="card"><h4>Choose the brain</h4><label for="engine">Answering mode</label><select id="engine"><option value="offline">Offline • built-in AP CSP reference</option><option value="gemini">Online • Gemini AI (your API key)</option><option value="ollama">Local • Ollama (if installed)</option></select><div id="onlineConfig" style="display:none"><label for="key">Google AI Studio API key</label><input id="key" type="password" autocomplete="off" placeholder="Paste your Gemini API key">
 <div style="display:flex;align-items:center;gap:8px;margin:-2px 0 8px"><input id="rememberKey" type="checkbox" style="width:15px;height:15px;flex:none;margin:0;accent-color:#26646b"><label for="rememberKey" style="margin:0;cursor:pointer">Remember key on this browser</label></div>
 <button id="forgetKey" type="button" style="border:1px solid #b99a71;border-radius:4px;background:#f5e5c5;color:#6a4a29;font:700 10px system-ui;cursor:pointer;padding:6px 10px;margin:0 0 9px">Forget saved key</button>
 <div id="keyStatus" class="hint" role="status" style="margin:-1px 0 10px">Not saved. Your key is kept only while this page is open.</div>
@@ -153,7 +165,14 @@ DISPLAY(x)</textarea><button id="traceBtn" class="cta">Trace program</button><di
   <div class="quota-all" id="quotaAll" aria-live="polite"></div>
   <p class="hint">Find your real per-model RPD limits at <a href="https://aistudio.google.com/rate-limit" target="_blank" rel="noreferrer">AI Studio → Rate limits</a> and enter suitably conservative numbers here. Counters don't include requests from other apps or devices, and may reset if browser storage is cleared.</p>
   <p class="hint" id="routeStats" aria-live="polite">No successful online requests yet.</p>
-</div><p class="hint">The Remember option saves your key in browser storage, NOT in this HTML file. Browser storage can be read by other users of this browser profile. Do NOT remember a key on shared or school computers. Closing a private window, clearing site data, or moving the file may erase it.</p></div><p class="hint">A single HTML cannot contain a large general-purpose AI model. Offline tools are built-in reference solvers; online answers require the Google API and your free-tier project.</p></div><div class="card"><h4>About this voyage</h4><p>Everything in the interface, illustration and offline learning tools is embedded in this one file. No executable, installer or external UI library.</p><p>For screenshot answers, turn on Online AI, add a key, then capture or upload a picture.</p><p class="hint">Browser screen sharing requires permission and may be disabled by school policy. A floating browser popup cannot stay on top of unrelated apps. Right-click anywhere in this app to conceal or restore its contents. While Stealth Mode is enabled, three fast left-clicks anywhere inside the app open Google Classroom. Browser shortcuts cannot detect clicks in other programs.</p></div></div></section>
+</div><p class="hint">The Remember option saves your key in browser storage, NOT in this HTML file. Browser storage can be read by other users of this browser profile. Do NOT remember a key on shared or school computers. Closing a private window, clearing site data, or moving the file may erase it.</p></div><div id="ollamaConfig" style="display:none" class="local-config">
+  <h4>⚓ Old local AI · Ollama</h4>
+  <p class="hint">The original ScreenStudy used <strong>qwen3-vl:4b-instruct</strong> in Ollama. This mode works without Gemini quotas, but requires Ollama and the model already installed on this computer. It cannot run on a school PC without Ollama.</p>
+  <label for="ollamaHost">Local Ollama address</label><input id="ollamaHost" type="text" value="http://127.0.0.1:11434" autocomplete="off" spellcheck="false">
+  <label for="ollamaModel">Installed model name</label><input id="ollamaModel" type="text" value="qwen3-vl:4b-instruct" autocomplete="off" spellcheck="false">
+  <button type="button" id="ollamaCheck" class="cta">Test local connection</button>
+  <p id="ollamaInfo" class="hint" role="status">Only connects to your own computer. On GitHub Pages, Ollama may need <code>OLLAMA_ORIGINS=https://kevinkevinsonbooyah.github.io</code> configured and restarted, and Chrome may request local-network access.</p>
+</div><p class="hint">A single HTML cannot contain a large general-purpose AI model. Offline tools are built-in reference solvers. Gemini answers require an API key; local Ollama answers require an already-installed Ollama server.</p></div><div class="card"><h4>About this voyage</h4><p>Everything in the interface, illustration and offline learning tools is embedded in this one file. No executable, installer or external UI library.</p><p>For screenshot answers, choose Gemini or local Ollama, then use Screen, Box Capture, or Image. Box Capture always asks Chrome for screen-sharing permission.</p><p class="hint">Browser screen sharing requires permission and may be disabled by school policy. A floating browser popup cannot stay on top of unrelated apps. Right-click anywhere in this app to conceal or restore its contents. While Stealth Mode is enabled, three fast left-clicks anywhere inside the app open Google Classroom. Browser shortcuts cannot detect clicks in other programs.</p></div></div></section>
 </main>
 <footer class="foot"><span>☸ AP CSP • Free-tier smart routing</span><span id="status">Ready to sail</span></footer>
 </div>
@@ -238,10 +257,100 @@ function bootMini(win,root){
  async function processImage(file){if(!file||!file.type.startsWith('image/')){setStatus('Not an image');return}let bmp=await createImageBitmap(file);let scale=Math.min(1,1500/Math.max(bmp.width,bmp.height));let can=doc.createElement('canvas');can.width=Math.max(1,Math.round(bmp.width*scale));can.height=Math.max(1,Math.round(bmp.height*scale));let ctx=can.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,can.width,can.height);ctx.drawImage(bmp,0,0,can.width,can.height);if(bmp.close)bmp.close();attached(can.toDataURL('image/jpeg',.83));setStatus('Image loaded')}
  q('upload').onclick=()=>q('file').click();q('file').onchange=async e=>{try{await processImage(e.target.files[0])}catch(x){setStatus('Image could not open')}e.target.value=''};
  q('prompt').addEventListener('paste',async e=>{const item=[...(e.clipboardData?.items||[])].find(x=>x.type.startsWith('image/'));if(item){e.preventDefault();try{await processImage(item.getAsFile())}catch(x){setStatus('Paste failed')}}});
- async function screenshot(){try{if(!win.navigator.mediaDevices?.getDisplayMedia){setStatus('Screen capture unavailable');return}setStatus('Choose a screen or tab…');const stream=await win.navigator.mediaDevices.getDisplayMedia({video:{cursor:'always'},audio:false});const video=doc.createElement('video');video.muted=true;video.srcObject=stream;await video.play();await new Promise(r=>win.setTimeout(r,260));const can=doc.createElement('canvas'),scale=Math.min(1,1500/Math.max(video.videoWidth,video.videoHeight));can.width=Math.round(video.videoWidth*scale);can.height=Math.round(video.videoHeight*scale);can.getContext('2d').drawImage(video,0,0,can.width,can.height);stream.getTracks().forEach(x=>x.stop());attached(can.toDataURL('image/jpeg',.85));setStatus('Screenshot attached')}catch(e){setStatus('Capture canceled or blocked')}}
+ async function captureFrame(){
+   if(!win.navigator.mediaDevices?.getDisplayMedia)throw Error('Screen capture is blocked in this browser.');
+   // Permission is requested for every new capture; never retain the live stream.
+   const stream=await win.navigator.mediaDevices.getDisplayMedia({video:true,audio:false});
+   let video;
+   try{
+     video=doc.createElement('video');video.muted=true;video.playsInline=true;video.srcObject=stream;
+     await video.play();
+     if(!video.videoWidth)await new Promise((resolve,reject)=>{video.onloadeddata=resolve;win.setTimeout(()=>reject(Error('No video frame')),3500)});
+     await new Promise(r=>win.setTimeout(r,180));
+     const can=doc.createElement('canvas');can.width=video.videoWidth;can.height=video.videoHeight;
+     if(!can.width||!can.height)throw Error('Screen-sharing returned an empty frame.');
+     can.getContext('2d',{alpha:false}).drawImage(video,0,0);
+     return can;
+   }finally{stream.getTracks().forEach(track=>track.stop());if(video){video.pause();video.srcObject=null}}
+ }
+ async function screenshot(){try{setStatus('Choose a screen or tab…');const source=await captureFrame();const scale=Math.min(1,1500/Math.max(source.width,source.height));const can=doc.createElement('canvas');can.width=Math.round(source.width*scale);can.height=Math.round(source.height*scale);can.getContext('2d').drawImage(source,0,0,can.width,can.height);attached(can.toDataURL('image/jpeg',.85));setStatus('Screen attached')}catch(e){setStatus(e?.message||'Capture canceled or blocked')}}
  q('screenshot').onclick=screenshot;
+ async function boxCapture(){
+   try{
+     setStatus('Choose a screen or tab, then drag a box…');
+     const source=await captureFrame();
+     const overlay=doc.createElement('div');overlay.className='crop-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-label','Box Capture');
+     overlay.innerHTML='<div class="crop-title"><b>▣ Box Capture</b><span class="crop-help">Drag over the question • Esc to cancel</span></div><div class="crop-stage"><div class="crop-surface"><img draggable="false" alt="Screen capture preview"><div class="crop-selection"></div></div></div><div class="crop-buttons"><button type="button" class="crop-use" disabled>Use selected box</button><button type="button" class="crop-all">Use full image</button><button type="button" class="crop-cancel">Cancel</button></div>';
+     // Attach overlay to body, including when the main application is embedded as a fallback.
+     doc.body.appendChild(overlay);
+     const img=overlay.querySelector('img'),surface=overlay.querySelector('.crop-surface'),sel=overlay.querySelector('.crop-selection'),use=overlay.querySelector('.crop-use');
+     const preview=source.toDataURL('image/jpeg',.88);img.src=preview;
+     let start=null,box=null,active=false;
+     const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
+     const pos=e=>{const r=img.getBoundingClientRect();return {x:clamp(e.clientX-r.left,0,r.width),y:clamp(e.clientY-r.top,0,r.height),w:r.width,h:r.height}};
+     function draw(){if(!box)return;sel.style.display='block';sel.style.left=box.x+'px';sel.style.top=box.y+'px';sel.style.width=box.w+'px';sel.style.height=box.h+'px';use.disabled=box.w<5||box.h<5}
+     function cleanup(){doc.removeEventListener('keydown',onKey,true);overlay.remove()}
+     function onKey(e){if(e.key==='Escape'){e.preventDefault();cleanup();setStatus('Box Capture canceled')}}
+     doc.addEventListener('keydown',onKey,true);
+     surface.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();start=pos(e);active=true;box=null;sel.style.display='none';use.disabled=true;surface.setPointerCapture(e.pointerId)});
+     surface.addEventListener('pointermove',e=>{if(!active||!start)return;const v=pos(e);box={x:Math.min(start.x,v.x),y:Math.min(start.y,v.y),w:Math.abs(v.x-start.x),h:Math.abs(v.y-start.y)};draw()});
+     surface.addEventListener('pointerup',e=>{if(!active)return;active=false;const v=pos(e);box={x:Math.min(start.x,v.x),y:Math.min(start.y,v.y),w:Math.abs(v.x-start.x),h:Math.abs(v.y-start.y)};draw();try{surface.releasePointerCapture(e.pointerId)}catch(_){}});
+     use.onclick=()=>{
+       if(!box||box.w<5||box.h<5)return;
+       const rect=img.getBoundingClientRect(),sx=source.width/rect.width,sy=source.height/rect.height;
+       const x=Math.max(0,Math.floor(box.x*sx)),y=Math.max(0,Math.floor(box.y*sy));
+       const w=Math.min(source.width-x,Math.max(1,Math.ceil(box.w*sx))),h=Math.min(source.height-y,Math.max(1,Math.ceil(box.h*sy)));
+       const scaled=Math.min(1,1800/Math.max(w,h));const cropped=doc.createElement('canvas');cropped.width=Math.max(1,Math.round(w*scaled));cropped.height=Math.max(1,Math.round(h*scaled));
+       cropped.getContext('2d').drawImage(source,x,y,w,h,0,0,cropped.width,cropped.height);
+       attached(cropped.toDataURL('image/jpeg',.88));cleanup();setStatus('Selected question attached');
+     };
+     overlay.querySelector('.crop-all').onclick=()=>{const f=Math.min(1,1800/Math.max(source.width,source.height));const can=doc.createElement('canvas');can.width=Math.round(source.width*f);can.height=Math.round(source.height*f);can.getContext('2d').drawImage(source,0,0,can.width,can.height);attached(can.toDataURL('image/jpeg',.84));cleanup();setStatus('Full screen attached')};
+     overlay.querySelector('.crop-cancel').onclick=()=>{cleanup();setStatus('Box Capture canceled')};
+   }catch(e){setStatus(e?.message||'Box Capture canceled or blocked')}
+ }
+ q('boxCapture').onclick=boxCapture;
  q('clear').onclick=()=>{history=[];q('chat').innerHTML='<div class="empty" id="empty"><div class="art">⚓</div><b>Fresh parchment.</b><p>Ready for another question.</p></div>';clearAttached()};
- q('engine').onchange=()=>{const online=q('engine').value==='gemini';q('onlineConfig').style.display=online?'block':'none';q('net').classList.toggle('online',online);q('netLabel').textContent=online?'AI Online':'Offline';setStatus(online?'Key required for AI':'Offline compass ready')};
+ q('engine').onchange=()=>{
+ const mode=q('engine').value,online=mode==='gemini',local=mode==='ollama';
+ q('onlineConfig').style.display=online?'block':'none';q('ollamaConfig').style.display=local?'block':'none';
+ q('net').classList.toggle('online',online||local);
+ q('netLabel').textContent=local?'Local AI':online?'Gemini AI':'Offline';
+ setStatus(local?'Ollama must be running on this PC':online?'Gemini API key required':'Offline compass ready');
+};
+ try{const settings=JSON.parse(win.localStorage.getItem('ai-bottle:ollama-settings')||'null');if(settings){if(settings.host)q('ollamaHost').value=settings.host;if(settings.model)q('ollamaModel').value=settings.model}}catch(e){}
+ ['ollamaHost','ollamaModel'].forEach(id=>q(id).addEventListener('change',()=>{try{win.localStorage.setItem('ai-bottle:ollama-settings',JSON.stringify({host:q('ollamaHost').value,model:q('ollamaModel').value}))}catch(e){}}));
+ q('ollamaCheck').onclick=async()=>{
+  const info=q('ollamaInfo');info.textContent='Checking local Ollama…';
+  try{const {host}=getOllamaSettings();const controller=new AbortController();const timeout=win.setTimeout(()=>controller.abort(),6000);
+   let res;try{res=await win.fetch(host+'/api/tags',{signal:controller.signal})}finally{win.clearTimeout(timeout)}
+   if(!res.ok)throw Error('HTTP '+res.status);
+   const data=await res.json();const models=(data.models||[]).map(m=>m.name||m.model);
+   info.textContent='Connected! Installed models: '+(models.join(', ')||'none yet')+'. Set an installed model name above.';
+  }catch(e){info.textContent='Cannot connect. Install/start Ollama and pull the model on this PC. If using GitHub Pages, allow this origin with OLLAMA_ORIGINS and restart Ollama. Details: '+e.message}
+ };
+ function getOllamaSettings(){
+  const host=q('ollamaHost').value.trim().replace(/\/+$/,'');
+  if(!/^http:\/\/(?:127\.0\.0\.1|localhost):11434$/i.test(host))throw Error('Only your own Ollama at http://127.0.0.1:11434 is allowed.');
+  const model=q('ollamaModel').value.trim();
+  if(!/^[a-z0-9][a-z0-9._:/-]{0,100}$/i.test(model))throw Error('Enter a valid installed Ollama model name.');
+  return {host,model};
+ }
+ async function ollamaAnswer(txt,img){
+  const {host,model}=getOllamaSettings();
+  requestCtrl=new AbortController();
+  const msg={role:'user',content:txt||'Read the screenshot and solve it carefully.'};
+  if(img)msg.images=[img.slice(img.indexOf(',')+1)];
+  const messages=[{role:'system',content:SYSTEM},...history.slice(-6).map(x=>({role:x.role==='model'?'assistant':x.role,content:x.text})),msg];
+  setStatus('Local Ollama · '+model);
+  const res=await win.fetch(host+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model,stream:false,keep_alive:'10m',messages,options:{temperature:0.15}}),signal:requestCtrl.signal});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok)throw Error(data.error||'Ollama HTTP '+res.status);
+  const answer=data.message?.content?.trim();if(!answer)throw Error('Ollama returned no answer. Verify the chosen model.');
+  history.push({role:'user',text:txt||'[image question]'},{role:'model',text:answer});
+  lastRouteLabel='Ollama · '+model;
+  return answer;
+ }
+
   // Optional per-browser persistence. Never write the API key into the HTML.
   const STORE_KEY='ai-bottle:gemini-key:v1';
   const keyNotice=msg=>q('keyStatus').textContent=msg;
@@ -446,7 +555,7 @@ function bootMini(win,root){
    if(!attempted)throw Error('All models are cooling down or have reached this app daily allowance. Adjust your personal limits in Config if your AI Studio quota allows it, or wait for the reset.');
    throw Error('No free-tier model is available right now. '+errors.slice(0,3).join(' | '));
  }
- async function send(){const txt=q('prompt').value.trim(),img=imageData;if(!txt&&!img)return;if(q('send').disabled)return;lastRouteLabel='';q('send').disabled=true;q('cancel').style.display='inline-block';addMsg('user',txt||'[Screenshot question]',img);q('prompt').value='';clearAttached();setStatus('Plotting a course…');const wait=addMsg('assistant','Charting the answer…');wait.classList.add('loading');try{let ans,local=simpleAnswer(txt);if(q('engine').value==='offline'){if(img){ans='This offline HTML cannot read screenshots. Open Config → Online Gemini, add an API key, then send the screenshot again.'}else{ans=local?local.text:'I can solve common AP CSP questions offline (binary, overflow, logic, networking, pseudocode basics), but I cannot reliably reason through this particular question without a connected AI model.\n\nTry the Study tab for drills, or enable Online Gemini in Config.'}}else if(local&&local.type==='exact'&&!img){ans=local.text+'\n\n✓ Verified by the offline calculator.'}else{ans=await onlineAnswer(txt,img)}wait.textContent=ans;if(lastRouteLabel&&q('engine').value==='gemini'&&!(local&&local.type==='exact'&&!img)){wait.parentNode?.querySelector('.tag')?.append(' · '+lastRouteLabel);setStatus('Answered by '+lastRouteLabel)}else{setStatus('Answer ready • no API request')}lastRouteLabel=''}catch(e){wait.textContent='Could not complete the request: '+(e.name==='AbortError'?'Canceled.':e.message)+'\n\nCheck internet access, key, and model availability. Offline tools still work.';setStatus('Connection issue')}finally{wait.classList.remove('loading');q('send').disabled=false;q('cancel').style.display='none';requestCtrl=null;q('chat').scrollTop=q('chat').scrollHeight}}
+ async function send(){const txt=q('prompt').value.trim(),img=imageData;if(!txt&&!img)return;if(q('send').disabled)return;lastRouteLabel='';q('send').disabled=true;q('cancel').style.display='inline-block';addMsg('user',txt||'[Screenshot question]',img);q('prompt').value='';clearAttached();setStatus('Plotting a course…');const wait=addMsg('assistant','Charting the answer…');wait.classList.add('loading');try{let ans,local=simpleAnswer(txt);if(q('engine').value==='ollama'){ans=await ollamaAnswer(txt,img)}else if(q('engine').value==='offline'){if(img){ans='This offline HTML cannot read screenshots. Open Config → Online Gemini, add an API key, then send the screenshot again.'}else{ans=local?local.text:'I can solve common AP CSP questions offline (binary, overflow, logic, networking, pseudocode basics), but I cannot reliably reason through this particular question without a connected AI model.\n\nTry the Study tab for drills, or enable Online Gemini in Config.'}}else if(local&&local.type==='exact'&&!img){ans=local.text+'\n\n✓ Verified by the offline calculator.'}else{ans=await onlineAnswer(txt,img)}wait.textContent=ans;if(lastRouteLabel&&(q('engine').value==='ollama'||(q('engine').value==='gemini'&&!(local&&local.type==='exact'&&!img)))){wait.parentNode?.querySelector('.tag')?.append(' · '+lastRouteLabel);setStatus('Answered by '+lastRouteLabel)}else{setStatus('Answer ready • no API request')}lastRouteLabel=''}catch(e){wait.textContent='Could not complete the request: '+(e.name==='AbortError'?'Canceled.':e.message)+'\n\nCheck internet access, key, and model availability. Offline tools still work.';setStatus('Connection issue')}finally{wait.classList.remove('loading');q('send').disabled=false;q('cancel').style.display='none';requestCtrl=null;q('chat').scrollTop=q('chat').scrollHeight}}
  // study questions
  const quiz=[
  ['Data','What is the decimal value of the binary number 10010101?',['149','151','153','145'],0,'10010101 = 128 + 16 + 4 + 1 = 149.'],
