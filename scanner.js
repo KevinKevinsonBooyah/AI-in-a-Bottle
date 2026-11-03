@@ -9,7 +9,8 @@ window.setupCodeScanner=function(win,root,traceCode){
   q('scanLang').dataset.bound='1';
 
   const samples={
-    javascript:'console.log("Ahoy from JavaScript!");\nconst nums = [2, 4, 6];\nconsole.table(nums.map(n => ({ n, square: n*n })));',
+    javascript:'var booleanIceCream = readBoolean("Do you like ice cream? ");\n\nif (booleanIceCream) {\n  println("Nice! Me too!");\n} else {\n  println("That\'s okay!");\n}',
+    'javascript-graphics':'function start() {\n  var ocean = new Rectangle(getWidth(), getHeight());\n  ocean.setColor("#a6f2e3");\n  add(ocean);\n  var sun = new Circle(35);\n  sun.setPosition(105, 70);\n  sun.setColor(Color.yellow);\n  add(sun);\n  var text = new Text("Ahoy, JavaScript Graphics!", "18px Arial");\n  text.setPosition(28, 160);\n  add(text);\n}',
     html:'<h2>Ship log</h2>\n<p>This HTML runs inside a separate sandbox.</p>\n<button onclick="this.textContent=\'Clicked!\';">Click me</button>',
     css:'body { background: #e8fbf6; font-family: sans-serif; }\nh2 { color: #08776d; letter-spacing: 2px; }\nbutton { background: #076d74; color: white; padding: 9px; border: 0; border-radius: 6px; }',
     typescript:'const greet = (name: string): string => "Ahoy, " + name + "!";\nconsole.log(greet("captain"));\nconst x: number[] = [1, 2, 3];\nconsole.log(x.map(n => n*n));',
@@ -19,7 +20,8 @@ window.setupCodeScanner=function(win,root,traceCode){
     pseudo:'x ← 3\nREPEAT 4 TIMES\n{\n  x ← x + 2\n}\nDISPLAY(x)'
   };
   const help={
-    javascript:'JavaScript console: console.log(), console.table(), errors and async/await work. Runs in a stoppable Worker; network requests are blocked.',
+    javascript:'JavaScript Console: console.log, println, print, readBoolean, readLine, readInt and readFloat work. Input questions with quoted prompts are asked before the sandbox runs. Stoppable, no network.',
+    'javascript-graphics':'JavaScript Graphics: CodeHS-style Rectangle, Circle, Line, Oval, Text, add(), Color, mouseClickMethod(), setTimer() and more. Runs in a sandboxed canvas.',
     html:'HTML preview: renders a separate sandboxed webpage. Code cannot access AI in a Bottle or its API key.',
     css:'CSS preview: see your styles applied to a sample webpage, without changing the AI app.',
     typescript:'TypeScript: downloads a compiler on first use, compiles to JavaScript and runs in the console.',
@@ -28,7 +30,7 @@ window.setupCodeScanner=function(win,root,traceCode){
     json:'JSON: validate structure and view a pretty-printed result. No code execution.',
     pseudo:'AP CSP pseudocode: follow assignments, DISPLAY, and REPEAT n TIMES blocks.'
   };
-  let current=null,limitTimer=null,sequence=0;
+  let current=null,limitTimer=null,sequence=0,stopGraphics=null;
   const workers=Object.create(null);
   function output(line){
     const box=q('scanOutput'),original=box.textContent;
@@ -55,6 +57,7 @@ window.setupCodeScanner=function(win,root,traceCode){
     busy(false);
   }
   function stopRun(silent){
+    if(stopGraphics){try{stopGraphics()}catch(e){}stopGraphics=null;if(!silent)output('■ Graphics stopped.');busy(false);return;}
     if(limitTimer){win.clearTimeout(limitTimer);limitTimer=null;}
     if(current){
       const type=current.language;
@@ -77,7 +80,7 @@ window.setupCodeScanner=function(win,root,traceCode){
       try{return JSON.stringify(x,null,2)??String(x);}catch(e){return String(x);}
     };
     self.addEventListener('message',async event=>{
-      const data=event.data||{},id=data.id,lang=data.lang,code=String(data.code||'');
+      const data=event.data||{},id=data.id,lang=data.lang,code=String(data.code||''),inputs=Array.isArray(data.inputs)?data.inputs.slice():[];
       try{
         if(lang==='javascript'||lang==='typescript'){
           let program=code;
@@ -102,15 +105,32 @@ window.setupCodeScanner=function(win,root,traceCode){
             capture[kind]=(...args)=>post(id,'line',(kind==='warn'?'⚠ ':kind==='error'?'✕ ':'')+args.map(show).join(' '));
           }
           self.console=capture;
+          const nextInput=(type)=>{
+            const x=inputs.shift();
+            if(!x||x.kind!==type)throw Error('Input missing for '+type+'. Use a quoted prompt such as readBoolean("Yes or no?") and run again.');
+            return x.value;
+          };
+          const readBoolean=()=>Boolean(nextInput('readBoolean'));
+          const readLine=()=>String(nextInput('readLine'));
+          const readInt=()=>Number(nextInput('readInt'));
+          const readFloat=()=>Number(nextInput('readFloat'));
+          const println=(...args)=>post(id,'line',args.map(show).join(' '));
+          const print=(...args)=>post(id,'line',args.map(show).join(' '));
+          const Randomizer={
+            nextInt:(min,max)=>Math.floor(min+Math.random()*(max-min+1)),
+            nextBoolean:()=>Math.random()<0.5,
+            nextFloat:(min,max)=>min+Math.random()*(max-min),
+            nextColor:()=>['red','green','blue','orange','purple'][Math.floor(Math.random()*5)]
+          };
           const AsyncFunction=Object.getPrototypeOf(async function(){}).constructor;
           const trimmed=program.trim();
           let executor=null;
           // A console also evaluates single expressions such as 2+2 and Math.sqrt(16).
           if(trimmed&&!/[;\n]/.test(trimmed)&&!/^(?:const|let|var|function|class|if|for|while|try|switch|throw|return|import|export)\b/.test(trimmed)){
-            try{executor=new AsyncFunction('console','return ('+trimmed+');');}catch(e){}
+            try{executor=new AsyncFunction('console','println','print','readBoolean','readLine','readInt','readFloat','Randomizer','return ('+trimmed+');');}catch(e){}
           }
-          if(!executor)executor=new AsyncFunction('console',program);
-          const answer=await executor(capture);
+          if(!executor)executor=new AsyncFunction('console','println','print','readBoolean','readLine','readInt','readFloat','Randomizer',program);
+          const answer=await executor(capture,println,print,readBoolean,readLine,readInt,readFloat,Randomizer);
           if(answer!==undefined)post(id,'line','↳ '+show(answer));
         }else if(lang==='python'){
           if(!py){
@@ -152,8 +172,34 @@ window.setupCodeScanner=function(win,root,traceCode){
       return workers[lang];
     }finally{win.setTimeout(()=>win.URL.revokeObjectURL(blobUrl),8000);}
   }
+  function collectConsoleInputs(code){
+    const inputs=[];
+    const matcher=/\b(readBoolean|readLine|readInt|readFloat)\s*\(\s*(['"])(.*?)\2\s*\)/g;
+    let m;
+    while((m=matcher.exec(code))){
+      if(inputs.length>=30)throw Error('Too many input questions in one run (maximum 30).');
+      const kind=m[1],message=m[3].replace(/\n/g,'\n');
+      let answer=null,valid=false;
+      for(let tries=0;tries<5&&!valid;tries++){
+        answer=win.prompt(message+(kind==='readBoolean'?' (true/false or yes/no)':''),kind==='readBoolean'?'yes':'');
+        if(answer===null)throw Error('User input cancelled.');
+        answer=String(answer).trim();
+        if(kind==='readBoolean'){
+          if(/^(?:yes|y|true|1)$/i.test(answer)){answer=true;valid=true;}
+          else if(/^(?:no|n|false|0)$/i.test(answer)){answer=false;valid=true;}
+        }else if(kind==='readInt'){
+          valid=/^-?\d+$/.test(answer)&&Number.isSafeInteger(Number(answer));if(valid)answer=Number(answer);
+        }else if(kind==='readFloat'){
+          valid=answer!==''&&Number.isFinite(Number(answer));if(valid)answer=Number(answer);
+        }else valid=true;
+      }
+      if(!valid)throw Error('Invalid answer for '+kind+' after five tries.');
+      inputs.push({kind,value:answer});
+    }
+    return inputs;
+  }
   function run(){
-    if(current)return;
+    if(current||stopGraphics)return;
     const lang=q('scanLang').value,code=q('scanInput').value;
     q('scanOutput').textContent='';
     q('scanPreviewWrap').hidden=true;
@@ -166,6 +212,14 @@ window.setupCodeScanner=function(win,root,traceCode){
     }
     if(lang==='pseudo'){
       try{output(traceCode(code));}catch(e){output('✕ '+e.message);}
+      return;
+    }
+    if(lang==='javascript-graphics'){
+      if(typeof window.createAIBottleGraphics!=='function'){output('JavaScript Graphics needs graphics.js beside the HTML page.');return;}
+      q('scanPreviewWrap').hidden=false;
+      busy(true);
+      stopGraphics=window.createAIBottleGraphics(win,q('scanPreview'),code,output);
+      output('▶ JavaScript Graphics canvas running. Press Stop to clear it.');
       return;
     }
     if(lang==='html'||lang==='css'){
@@ -182,6 +236,10 @@ window.setupCodeScanner=function(win,root,traceCode){
     if(!win.Worker){output('Your browser cannot run Worker-based code.');return;}
     let runner;
     try{runner=obtainWorker(lang);}catch(e){output('✕ Cannot start code runner: '+e.message);return;}
+    let inputs=[];
+    if(lang==='javascript'||lang==='typescript'){
+      try{inputs=collectConsoleInputs(code);}catch(e){output('Input cancelled: '+e.message);return;}
+    }
     const id=++sequence;
     current={id,language:lang,worker:runner};
     busy(true);
@@ -202,7 +260,7 @@ window.setupCodeScanner=function(win,root,traceCode){
       output('■ Time limit reached. Sandbox stopped.');
       stopRun(true);
     },lang==='python'||lang==='sql'?120000:20000);
-    try{runner.postMessage({id,lang,code});}
+    try{runner.postMessage({id,lang,code,inputs});}
     catch(e){output('✕ '+e.message);stopRun(true);}
   }
 
@@ -211,6 +269,7 @@ window.setupCodeScanner=function(win,root,traceCode){
     q('scanInput').value=samples[lang]||'';
     q('scanHint').textContent=help[lang]||'';
     q('scanPreviewWrap').hidden=true;
+    q('scanPreview').setAttribute('sandbox','allow-scripts');
     q('scanOutput').textContent='Ready. Choose Run code when you want to test '+lang+'.';
   }
   q('scanRun').addEventListener('click',run);
