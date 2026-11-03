@@ -47,3 +47,13 @@ For GitHub Pages, Ollama might block browser-origin requests. If needed, set `OL
 - **Settings → Import Config** restores the supported settings only. Paste the Gemini API key yourself each new session.
 - **Ollama → Repair Ollama** checks the local connection and downloads a Windows `.cmd` troubleshooting script. It is not launched automatically. After you review and run it on your **own** Windows PC, the script offers to install Ollama via official `winget`, pull the model, and optionally set the GitHub Pages origin. The app cannot bypass school installation restrictions.
 - The app now includes animated sea backgrounds, a revised Classroom-tab favicon, simplified settings and general-subject practice questions alongside AP CSP.
+
+
+## Ghost Mode and capture update (November 2026)
+
+- **Stealth mini-window:** dark ocean-night theme, animated radar scan and a small “Ghost Mode” indicator. The tab favicon/title switch to Classroom when Stealth Mode is active; this is only a visual tab disguise, not Google Classroom itself.
+- **Close/reopen:** right-click *inside* the mini-window to close it completely. Right-click inside the original AI in a Bottle web page, or focus that page and press **Alt + Shift + B**, to reopen it with your current draft. Web pages cannot detect right-clicks on Chrome's tab strip, browser chrome, other tabs or other apps.
+- **Box Capture:** on the first use per open mini-window, select a screen or tab in Chrome's permission chooser. The app keeps the approved capture stream for follow-up screenshots, so later Box Capture/Screen presses don't open the chooser again. **Stop Sharing** stops the stream; closing the mini-window stops it too. Chrome's first-time picker is mandatory and cannot be bypassed by HTML. Reusing a stream does not provide permission for other screens.
+- **Ollama setup:** **Settings → Ollama** includes numbered instructions and official links for installation, model download (`ollama pull qwen3-vl:4b-instruct`), service testing, and allowing the website origin. **Repair Ollama** diagnoses first; the optional Windows script download is a separate, explicit click. Only run that script on your own computer with permission to install software.
+
+Sources: [Ollama Windows](https://docs.ollama.com/windows), [Ollama FAQ](https://docs.ollama.com/faq), [Qwen model](https://ollama.com/library/qwen3-vl:4b-instruct), [MDN display capture](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getDisplayMedia), [Chrome Local Network Access](https://developer.chrome.com/docs/modern-web-guidance/guides/security/local-network-access).
