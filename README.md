@@ -119,3 +119,10 @@ Free local inference means no per-message credits; it does not guarantee interne
 
 - **Tools → Code Scanner → JavaScript Console** accepts `console.log`, `println`, `print`, `readLine`, `readBoolean`, `readInt`, `readFloat`, and `Randomizer`. For security it uses a stoppable Worker with no access to the app's API key and networking disabled. Input prompts using quoted literal questions, such as `readBoolean("Do you like ice cream?")`, are gathered before launching the Worker. Complex dynamic input prompts and some CodeHS library functions are not supported; the tool implements a subset, not the entire CodeHS library.
 - **JavaScript Graphics** is a separate Code Scanner language. Its canvas runner supports `Rectangle`, `Circle`, `Oval`, `Line`, `Text`, `add`, `remove`, `removeAll`, `getWidth`, `getHeight`, `Color`, `mouseClickMethod`, `keyDownMethod`, `setTimer` and other basic helpers. It runs in an iframe with an opaque origin and network-blocking CSP, unlike a system terminal. Use Run/Stop and see console output beside the preview. See [CodeHS JavaScript docs](https://codehs.com/editor/documentation/js) for the language's native environment; this implementation is an independently written compatible subset.
+
+
+## Browser Vision repetition-loop protection
+
+The Phi-3.5 Vision browser model may sometimes fall into repetitive or nonsensical text generation, especially when asked text-only questions. In this app, **Browser Vision requires an attached image**; for greetings and normal text chats choose **Free Browser AI**. Browser generation is streamed and guarded against repeated word sequences, with repetition/frequency penalties and capped output tokens. If a loop is detected, the stream is closed, the reply is rejected, and the bad answer is not added to chat history.
+
+This is a defensive fix, not a guarantee of model accuracy. The repetition detector and simulated streaming cancellation were tested, but live Phi-3.5 Vision inference on a school Chromebook has not been verified.
