@@ -845,18 +845,72 @@ function bootMini(win,root){
    }catch(error){q('browserQuickStatus').textContent='Could not load '+title+': '+(error?.message||'unknown error');}
  };
 
+
+
+ function browserAIIsRepeating(text){
+  // Model degeneration guard: detect a short word pattern repeated many times.
+  if(typeof text!=='string'||text.length<65)return false;
+  const words=(text.toLowerCase().match(/[\p{L}\p{N}']+/gu)||[]);
+  if(words.length<18)return false;
+  const tail=words.slice(-100);
+  for(let width=1;width<=12;width++){
+   const copies=width<=2?8:width<=5?5:4;
+   if(tail.length<width*copies)continue;
+   const pattern=tail.slice(-width).join('\u0000');
+   let recurring=true;
+   for(let n=2;n<=copies;n++){
+    if(tail.slice(-width*n,-width*(n-1)).join('\u0000')!==pattern){recurring=false;break;}
+   }
+   if(recurring)return true;
+  }
+  // Catch slightly varying loops that still recycle the same small set of phrases.
+  if(words.length>=100){
+   const recent=words.slice(-100),grams=new Set();
+   for(let i=0;i<=recent.length-4;i++)grams.add(recent.slice(i,i+4).join(' '));
+   if(grams.size<22)return true;
+  }
+  return false;
+ }
  async function browserAnswer(txt,img){
-  if(img&&q('engine').value==='browser')throw Error('Free Browser AI is text only. Switch to Browser Vision, Gemini, or Ollama for images.');
-  if(!browserEngine||browserLoadedModel!==q('browserModel').value)throw Error('The model is not loaded. Go to Settings → Free Browser AI → Check Compatibility → Download & Start Free AI.');
+  const vision=q('engine').value==='browser-vision';
+  if(img&&!vision)throw Error('Free Browser AI only supports text. Use Browser Vision, Gemini or Ollama to read images.');
+  if(vision&&!img)throw Error('Browser Vision AI requires an image. For a normal text chat, switch to Free Browser AI.');
+  if(!browserEngine||browserLoadedModel!==q('browserModel').value)throw Error('Your model is not loaded. Open Settings, check compatibility and load the selected model.');
   browserCancelRequested=false;
-  setStatus('Free Browser AI is answering locally…');
-  const messages=[{role:'system',content:'You are AI in a Bottle. Answer accurately and clearly. Check calculations, acknowledge uncertainty, and explain solutions when helpful. Do not invent missing information.'},...history.slice(-6).map(x=>({role:x.role==='model'?'assistant':'user',content:x.text})),{role:'user',content:img?[{type:'text',text:txt||'Read and explain this image carefully.'},{type:'image_url',image_url:{url:img}}]:txt}];
-  const result=await browserEngine.chat.completions.create({messages,temperature:0.25,max_tokens:700});
-  if(browserCancelRequested)throw new DOMException('Canceled','AbortError');
-  const answer=String(result?.choices?.[0]?.message?.content||'').trim();
-  if(!answer)throw Error('The local model returned no text. Try another question or reload the model.');
+  setStatus(vision?'Browser Vision is reading the image…':'Free Browser AI is answering locally…');
+  const messages=[{
+   role:'system',
+   content:'You are AI in a Bottle. Answer the user question accurately and naturally. If the user supplied an image, describe only what you can see. Never repeat a sentence or phrase unnecessarily; end your response when you have answered.'
+  },
+   ...history.slice(-4).map(x=>({role:x.role==='model'?'assistant':'user',content:x.text})),
+   {role:'user',content:img?[{type:'text',text:txt||'Please read the image and answer the question clearly.'},{type:'image_url',image_url:{url:img}}]:txt}
+  ];
+  // Stream output so a runaway local model can be stopped before hundreds of repeated tokens.
+  // WebLLM closes a started stream when for-await exits due to an exception.
+  const stream=await browserEngine.chat.completions.create({
+   messages,stream:true,temperature:vision?0.55:0.45,top_p:0.9,
+   repetition_penalty:1.14,frequency_penalty:0.2,presence_penalty:0,
+   max_tokens:vision?380:580
+  });
+  let answer='',lastCheckLength=0;
+  for await(const chunk of stream){
+   if(browserCancelRequested)throw new DOMException('Canceled','AbortError');
+   const next=chunk?.choices?.[0]?.delta?.content;
+   if(typeof next!=='string'||!next)continue;
+   answer+=next;
+   if(answer.length>6000)throw Error('The model produced too much text, so the response was stopped.');
+   if(answer.length-lastCheckLength>=30){
+    lastCheckLength=answer.length;
+    if(browserAIIsRepeating(answer)){
+     throw Error('The local AI started repeating itself, so I stopped the response. Try again with a different question or image, or switch to another model.');
+    }
+   }
+  }
+  answer=answer.trim();
+  if(!answer)throw Error('The local model returned no response. Try loading another model.');
+  if(browserAIIsRepeating(answer))throw Error('The local model repeated itself, so the response was stopped.');
   history.push({role:'user',text:txt},{role:'model',text:answer});
-  lastRouteLabel=(q('engine').value==='browser-vision'?'Browser Vision':'Browser AI')+' · '+BROWSER_MODELS[browserLoadedModel].level;
+  lastRouteLabel=(vision?'Browser Vision':'Browser AI')+' · '+BROWSER_MODELS[browserLoadedModel].level;
   return answer;
  }
  q('engine').onchange=()=>{
@@ -876,7 +930,7 @@ function bootMini(win,root){
  q('ollamaConfig').style.display=local?'block':'none';
  q('browserAIConfig').style.display=localBrowser?'block':'none';
  q('browserQuickBar').hidden=!browser;
- q('browserModelDescription').textContent=vision?'Experimental image-capable Phi 3.5 Vision runs locally with WebGPU. Needs roughly 4.5 GB of GPU memory. Check compatibility and confirm the large download first.':"Free Browser AI runs locally in Chrome. Pick Lightweight, Balanced, or Stronger here or in Ask. Text only, no API key.";
+ q('browserModelDescription').textContent=vision?'Experimental Phi 3.5 Vision reads images only in this app. For greetings and normal text conversations, choose Free Browser AI. Requires WebGPU and roughly 4.5 GB of GPU memory; check compatibility before downloading.':"Free Browser AI runs locally in Chrome. Pick Lightweight, Balanced, or Stronger here or in Ask. Text only, no API key.";
  q('quotaCompact').style.display=online?'block':'none';
  q('net').classList.toggle('online',online||local||localBrowser);
  q('netLabel').textContent=vision?'Vision AI':browser?'Browser AI':local?'Local AI':'Gemini AI';
@@ -1237,7 +1291,7 @@ exit /b 1
    if(!attempted)throw Error('All models are cooling down or have reached this app daily allowance. Adjust your personal limits in Config if your AI Studio quota allows it, or wait for the reset.');
    throw Error('No free-tier model is available right now. '+errors.slice(0,3).join(' | '));
  }
- async function send(){const txt=q('prompt').value.trim(),img=imageData;if(!txt&&!img)return;if(q('send').disabled)return;lastRouteLabel='';q('send').disabled=true;q('cancel').style.display='inline-block';addMsg('user',txt||'[Screenshot question]',img);q('prompt').value='';clearAttached();setStatus('Thinking…');const wait=addMsg('assistant','Working on it…');wait.classList.add('loading');try{let ans,local=simpleAnswer(txt);if(q('engine').value==='browser'||q('engine').value==='browser-vision'){ans=await browserAnswer(txt,img)}else if(q('engine').value==='ollama'){ans=await ollamaAnswer(txt,img)}else if(local&&local.type==='exact'&&!img){ans=local.text+'\n\n✓ Verified by the built-in calculator.'}else{ans=await onlineAnswer(txt,img)}wait.textContent=ans;if(lastRouteLabel&&(q('engine').value==='browser'||q('engine').value==='browser-vision'||q('engine').value==='ollama'||(q('engine').value==='gemini'&&!(local&&local.type==='exact'&&!img)))){wait.parentNode?.querySelector('.tag')?.append(' · '+lastRouteLabel);setStatus('Answered by '+lastRouteLabel)}else{setStatus('Answer ready • no API request')}lastRouteLabel=''}catch(e){wait.textContent='Could not complete the request: '+(e.name==='AbortError'?'Canceled.':e.message)+'\n\nCheck your selected AI and settings. For Free Browser AI, run Check Compatibility and Download & Start Free AI. The Tools tab remains available.';setStatus('Connection issue')}finally{wait.classList.remove('loading');q('send').disabled=false;q('cancel').style.display='none';requestCtrl=null;q('chat').scrollTop=q('chat').scrollHeight}}
+ async function send(){const txt=q('prompt').value.trim(),img=imageData;if(!txt&&!img)return;if(q('engine').value==='browser-vision'&&!img){setStatus('Browser Vision needs an image. Switch to Free Browser AI for text chats.');return;}if(q('send').disabled)return;lastRouteLabel='';q('send').disabled=true;q('cancel').style.display='inline-block';addMsg('user',txt||'[Screenshot question]',img);q('prompt').value='';clearAttached();setStatus('Thinking…');const wait=addMsg('assistant','Working on it…');wait.classList.add('loading');try{let ans,local=simpleAnswer(txt);if(q('engine').value==='browser'||q('engine').value==='browser-vision'){ans=await browserAnswer(txt,img)}else if(q('engine').value==='ollama'){ans=await ollamaAnswer(txt,img)}else if(local&&local.type==='exact'&&!img){ans=local.text+'\n\n✓ Verified by the built-in calculator.'}else{ans=await onlineAnswer(txt,img)}wait.textContent=ans;if(lastRouteLabel&&(q('engine').value==='browser'||q('engine').value==='browser-vision'||q('engine').value==='ollama'||(q('engine').value==='gemini'&&!(local&&local.type==='exact'&&!img)))){wait.parentNode?.querySelector('.tag')?.append(' · '+lastRouteLabel);setStatus('Answered by '+lastRouteLabel)}else{setStatus('Answer ready • no API request')}lastRouteLabel=''}catch(e){wait.textContent='Could not complete the request: '+(e.name==='AbortError'?'Canceled.':e.message)+'\n\nCheck your selected AI and settings. For Free Browser AI, run Check Compatibility and Download & Start Free AI. The Tools tab remains available.';setStatus('Connection issue')}finally{wait.classList.remove('loading');q('send').disabled=false;q('cancel').style.display='none';requestCtrl=null;q('chat').scrollTop=q('chat').scrollHeight}}
  // study questions
  const quiz=[
  ['Math','What is 15% of 240?',['24','36','48','60'],1,'0.15 × 240 = 36.'],
